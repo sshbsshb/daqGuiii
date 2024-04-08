@@ -1,0 +1,23 @@
+total_run_time: 3600
+equipment:
+- address: GPIB0::23::INSTR
+  name: keysight
+  connection: VISA
+  class: simu_daq
+  specific_parameters:
+    channels:
+    - 1
+    - 2
+    - 3
+    sample_rate: 1
+  type: DAQ
+- address: 192.168.1.100
+  name: ke
+  connection: Modbus
+  class: simu_psu
+  port: 502
+  specific_parameters:
+    max_current: 5
+    max_voltage: 30
+    schedule_csv: data.csv
+  type: PowerSupply
