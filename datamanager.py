@@ -7,7 +7,7 @@ from state import app_state
 class AsyncDataManager:
     def __init__(self):
         self.lock = asyncio.Lock()
-        self.plot_deque = deque(maxlen=100)
+        self.plot_deque = deque(maxlen=1000)
         # Initialize DataFrame with 'Timestamp' as the index this time
         self.data_df = pd.DataFrame(columns=['Timestamp']).set_index('Timestamp')
         self.data_accumulator = []

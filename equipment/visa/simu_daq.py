@@ -6,7 +6,7 @@ from pandas import Timestamp
 # import time
 
 class simu_daq(VisaEquipment):
-    def __init__(self, address="GPIB0::23::INSTR", schedule=None, data_manager=None, type = 'daq', channels=[101,102], recording_interval=1, name='simu_psu', *args, **kwargs):
+    def __init__(self, address="GPIB0::23::INSTR", schedule=None, data_manager=None, type = 'daq', channels=list(range(101, 197)), recording_interval=1, name='simu_psu', *args, **kwargs):
         super().__init__(address, type, schedule)  # Initialize the VisaEquipment part of this object
 
         self.name = name
@@ -15,9 +15,9 @@ class simu_daq(VisaEquipment):
         self.recording_interval = recording_interval
         self.data_manager = data_manager  # Store the AsyncDataManager instance
 
-    async def read_voltage(self, channels=[101,102]):
+    async def read_voltage(self, channels=list(range(101, 197))):
         # # Simulate reading voltage (dummy values)
-        print({channel: random() for channel in channels})
+        # print({channel: random() for channel in channels})
 
         """Simulates reading voltage values from the channels."""
         for channel in self.channels:
