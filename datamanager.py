@@ -29,7 +29,7 @@ class AsyncDataManager:
                 # Concatenate the new DataFrame with the existing one
                 self.data_df = pd.concat([self.data_df, new_df], axis=0).sort_index().ffill()
                 # Reset the accumulator
-                self.data_accumulator = []
+                self.data_accumulator.clear()
 
     async def periodically_update_dataframe(self, interval=60):
         """Periodically calls update_dataframe at the specified interval (in seconds)."""
