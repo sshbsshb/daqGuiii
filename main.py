@@ -137,8 +137,7 @@ async def task_monitor(data_manager, equipment_list):
     tasks = []
     while True:
         if app_state.is_running():
-            # Ensure tasks are not already running
-            if not tasks:  # Assuming `tasks` is accessible and used to track running tasks
+            if not tasks:
                 print("Starting tasks")
                 tasks.extend([
                     asyncio.create_task(eqpt.start()) for eqpt in equipment_list
@@ -146,14 +145,13 @@ async def task_monitor(data_manager, equipment_list):
                 tasks.append(asyncio.create_task(live_plot_updater(data_manager)))
                 tasks.append(asyncio.create_task(update_progress_marker()))
                 tasks.append(asyncio.create_task(data_manager.periodically_update_dataframe(interval=6)))
-                # Add other tasks as needed
         else:
             if tasks:
                 print("Stopping tasks")
                 for task in tasks:
                     task.cancel()
                 tasks.clear()
-        await asyncio.sleep(1)  # Check every second
+        await asyncio.sleep(1)
 
 ## main logic
 async def main():
