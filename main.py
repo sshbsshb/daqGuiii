@@ -119,9 +119,6 @@ async def setup_dpg(data_manager, equipment_list):
             dpg.add_button(label="Start", callback=start_stop_handler, tag="start_stop_button")#, user_data=(data_manager, equipment_list))
         with dpg.group(horizontal=False):
             setup_live_plot()
-        # Some spacing between plots (optional)
-        # dpg.add_spacer(height=2)
-        # Create a group for the progress plot
 
         with dpg.group(horizontal=False):
             setup_progress_plot(equipment_list)
@@ -158,13 +155,6 @@ async def task_monitor(data_manager, equipment_list):
                 tasks.clear()
         await asyncio.sleep(1)  # Check every second
 
-    # try:
-    #     await asyncio.gather(*tasks)
-    # except asyncio.CancelledError:
-    #     # Handle task cancellation here if necessary
-    #     await shutdown(tasks)
-    #     print("Tasks canceled")
-
 ## main logic
 async def main():
     # Initial setup
@@ -193,7 +183,7 @@ async def main():
     asyncio.create_task(task_monitor(data_manager, equipment_list))
 
     await setup_dpg(data_manager, equipment_list)
-    # Start Dear PyGui's rendering in a non-blocking way
+    # Start rendering in a non-blocking way
     while dpg.is_dearpygui_running():
         dpg.render_dearpygui_frame()
         await asyncio.sleep(0.016)  # Roughly 60 FPS
