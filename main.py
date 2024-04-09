@@ -7,6 +7,8 @@ from datamanager import AsyncDataManager
 import dearpygui.dearpygui as dpg
 import time
 from state import app_state
+import queue
+import threading
 
 
 ## config file
@@ -41,15 +43,17 @@ async def live_plot_updater(data_manager):
         dpg.render_dearpygui_frame()
         await asyncio.sleep(1/30)  # Update at roughly 30 FPS
 
-async def update_progress_marker():
-    start_time = time.time()
+def update_progress_marker():
+    start_time = app_state.get_start_time()
+    print("start_time="f"{start_time}")
+    # print("pg.does_item_exist="f"{dpg.does_item_exist("progress_marker")}")
     while app_state.is_running():
         current_time = time.time() - start_time
         if dpg.does_item_exist("progress_marker"):
             dpg.configure_item("progress_marker", x=[current_time])
         else:
             print("Progress marker does not exist yet.")
-        await asyncio.sleep(1)
+        # await asyncio.sleep(1)
 
 ### GUI---run live plot
 def setup_live_plot():
@@ -105,14 +109,16 @@ def start_stop_handler(sender, app_data, user_data):
         dpg.set_item_label(sender, "Stop")
         # Trigger tasks start
         app_state.start()
+        print("start_button="f"{app_state.is_running()}")
     else:
         dpg.set_item_label(sender, "Start")
         # Signal tasks to stop
         app_state.stop()
+        print("start_button="f"{app_state.is_running()}")
 
 ## main GUI
-async def setup_dpg(data_manager, equipment_list):
-    dpg.create_context()
+def setup_dpg(equipment_list):
+    # dpg.create_context()
     with dpg.window(label="Data Visualization", tag="main_window"):
         # Create a group for the live plot
         with dpg.group(horizontal=False):
@@ -130,11 +136,40 @@ async def setup_dpg(data_manager, equipment_list):
     dpg.setup_dearpygui()
     dpg.show_viewport()
     dpg.set_primary_window("main_window", True)
+    # dpg.start_dearpygui()
+
+    while dpg.is_dearpygui_running():
+        try:
+            # Check for an update request; use a non-blocking check
+            update_request = gui_update_queue.get_nowait()
+            # Process the update request; this is application-specific
+            # For example, update_request could be a callable function
+            update_request()
+
+        except queue.Empty:
+            pass
+        dpg.render_dearpygui_frame()
+        time.sleep(0.016)  # 0.016~60 FPS
+    
+    dpg.destroy_context()
 
 async def shutdown(tasks):
     for task in tasks:
         task.cancel()
     await asyncio.gather(*tasks, return_exceptions=True)
+
+# async def update_gui_periodically(data_manager):
+#     while app_state.is_running():
+#         if data_manager.new_data_available:
+#             # Ensure the GUI update is executed in the DPG thread
+#             dpg.add_thread_job(update_live_plot, data_manager)
+#             dpg.add_thread_job(update_progress_marker)
+
+#             # Reset the new data flag safely
+#             await data_manager.reset_new_data_flag()
+
+#         # Adjust the sleep duration to control how often the GUI updates
+#         await asyncio.sleep(1)
 
 async def task_monitor(data_manager, equipment_list):
     tasks = []
@@ -146,31 +181,58 @@ async def task_monitor(data_manager, equipment_list):
                 tasks.extend([
                     asyncio.create_task(eqpt.start()) for eqpt in equipment_list
                 ])
-                tasks.append(asyncio.create_task(live_plot_updater(data_manager)))
-                tasks.append(asyncio.create_task(update_progress_marker()))
+                # tasks.append(asyncio.create_task(live_plot_updater(data_manager)))
+                # tasks.append(asyncio.create_task(update_progress_marker()))/
                 tasks.append(asyncio.create_task(data_manager.periodically_update_dataframe(interval=6)))
                 # Add other tasks as needed
+            elif tasks:
+                # Update progress marker
+                gui_update_queue.put(lambda: update_progress_marker())
+                if data_manager.new_data_available:
+                    # Ensure the GUI update is executed in the DPG thread
+                    gui_update_queue.put(lambda: update_live_plot(data_manager))
+                    # Reset the new data flag safely
+                    await data_manager.reset_new_data_flag()
         else:
             if tasks:
                 print("Stopping tasks")
                 for task in tasks:
                     task.cancel()
                 tasks.clear()
+        # print("waiting start tasks")
         await asyncio.sleep(1)  # Check every second
 
-    # try:
-    #     await asyncio.gather(*tasks)
-    # except asyncio.CancelledError:
-    #     # Handle task cancellation here if necessary
-    #     await shutdown(tasks)
-    #     print("Tasks canceled")
+        # try:
+        #     await asyncio.gather(*tasks)
+        # except asyncio.CancelledError:
+        #     # Handle task cancellation here if necessary
+        #     await shutdown(tasks)
+        #     print("Tasks canceled")
+
+
 
 ## main logic
-async def main():
+async def asyn_main(data_manager, equipment_list):
+
+    # Start monitoring tasks based on app_state
+    task_monitor_task = asyncio.create_task(task_monitor(data_manager, equipment_list))
+    await task_monitor_task  # Wait for the task_monitor to complete (if it ever does)
+
+    # asyncio.create_task(update_gui_periodically(data_manager, equipment_list))
+
+    # await setup_dpg(data_manager, equipment_list)
+    # # Start Dear PyGui's rendering in a non-blocking way
+    # while dpg.is_dearpygui_running():
+    #     dpg.render_dearpygui_frame()
+    #     await asyncio.sleep(0.016)  # Roughly 60 FPS
+
+    # dpg.destroy_context()
+
+def initial_equipment(config_file="config.yaml"):
     # Initial setup
     data_manager = AsyncDataManager()
 
-    config = load_config('config.yaml')
+    config = load_config(config_file)
     equipment_list = []
  
     for eq_config in config['equipment']:
@@ -189,24 +251,31 @@ async def main():
         equipment_instance = class_(name=eq_config['name'], config=eq_config, schedule=schedule, data_manager=data_manager)
         equipment_list.append(equipment_instance)
 
-    # Start monitoring tasks based on app_state
-    asyncio.create_task(task_monitor(data_manager, equipment_list))
+    return data_manager, equipment_list
 
-    await setup_dpg(data_manager, equipment_list)
-    # Start Dear PyGui's rendering in a non-blocking way
-    while dpg.is_dearpygui_running():
-        dpg.render_dearpygui_frame()
-        await asyncio.sleep(0.016)  # Roughly 60 FPS
-
-    dpg.destroy_context()
+async def async_function():
+    while True:
+        print("Async function is running...")
+        await asyncio.sleep(1)
 
 if __name__ == "__main__":
+    gui_update_queue = queue.Queue()
+    data_manager, equipment_list = initial_equipment(config_file="config.yaml")
+    # setup_dpg(equipment_list)
 
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
+    # Initialize DPG context
+    dpg.create_context()
+    dpg_thread = threading.Thread(target=setup_dpg, args=(equipment_list,), daemon=True)
+    dpg_thread.start()
+    # asyncio.run(async_function())
+    # try:
+    # Instead of directly running `asyn_main`, you wait for it as part of your program's main async flow
+    asyncio.run(asyn_main(data_manager, equipment_list))
+    # except KeyboardInterrupt:
 
-        print("Caught keyboard interrupt. Exiting...")
-    finally:
-        dpg.destroy_context()
+    #     print("Caught keyboard interrupt. Exiting...")
+    # finally:
+    #     dpg.destroy_context()
+    # # Wait for the DPG thread to finish
+    dpg_thread.join()
 

@@ -11,12 +11,18 @@ class AsyncDataManager:
         # Initialize DataFrame with 'Timestamp' as the index this time
         self.data_df = pd.DataFrame(columns=['Timestamp']).set_index('Timestamp')
         self.data_accumulator = []
+        self.new_data_available = False  # New flag
 
     async def add_data(self, timestamp, sensor_id, new_data):
         """Adds new data to the accumulator."""
         async with self.lock:
             self.plot_deque.append((timestamp, sensor_id, new_data))
             self.data_accumulator.append({'Timestamp': timestamp, 'SensorID': sensor_id, 'Data': new_data})
+            self.new_data_available = True  # Set the flag when new data is added
+
+    async def reset_new_data_flag(self):
+        async with self.lock:
+            self.new_data_available = False
 
     async def update_dataframe(self):
         """Updates the pandas DataFrame with accumulated data."""
@@ -37,6 +43,7 @@ class AsyncDataManager:
             try:
                 await asyncio.sleep(interval)
                 await self.update_dataframe()
+                print("Periodic update was done.")
             except asyncio.CancelledError:
                 # Handle task cancellation
                 print("Periodic update was cancelled.")

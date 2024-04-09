@@ -11,13 +11,13 @@ equipment:
     - 3
     sample_rate: 1
   type: DAQ
-- address: 192.168.1.100
-  name: ke
-  connection: Modbus
-  class: simu_psu
-  port: 502
-  specific_parameters:
-    max_current: 5
-    max_voltage: 30
-    schedule_csv: data.csv
-  type: PowerSupply
+# - address: 192.168.1.100
+#   name: ke
+#   connection: Modbus
+#   class: simu_psu
+#   port: 502
+#   specific_parameters:
+#     max_current: 5
+#     max_voltage: 30
+#     schedule_csv: data.csv
+#   type: PowerSupply
