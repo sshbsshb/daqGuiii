@@ -26,7 +26,7 @@ class CsvSchedule(Schedule):
         schedule_data = []
         with open(self.csv_path, newline='') as csvfile:
             reader = csv.DictReader(csvfile)
-            total_time = 0.0  # Accumulator for the total elapsed time
+            time = 0.0  # Accumulator for the total elapsed time
             for row in reader:
                 time = float(row['time'])
                 value = float(row['value'])
