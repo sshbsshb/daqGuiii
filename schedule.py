@@ -26,16 +26,16 @@ class CsvSchedule(Schedule):
         schedule_data = []
         with open(self.csv_path, newline='') as csvfile:
             reader = csv.DictReader(csvfile)
-            total_time = 0.0  # Accumulator for the total elapsed time
             for row in reader:
-                delay = float(row['time'])
+                time = float(row['time'])
                 value = float(row['value'])
-                total_time += delay
-                schedule_data.append((total_time, value))
+                schedule_data.append((time, value))
         return schedule_data
 
     async def setup_schedule(self, task, *args, **kwargs):
-        for total_time, value in self.schedule_data:
+        last_time = 0
+        for time, value in self.schedule_data:
             if app_state.is_running():
-                await asyncio.sleep(total_time)
+                await asyncio.sleep(time-last_time)
+                last_time = time
                 await task(value=value)
