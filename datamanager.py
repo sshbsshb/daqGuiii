@@ -24,6 +24,13 @@ class AsyncDataManager:
             self.plot_deque.append((timestamp, sensor_id, new_data))
             self.data_accumulator.append({'Timestamp': timestamp, 'SensorID': sensor_id, 'Data': new_data})
 
+    async def add_data_batch(self, data_tuples):
+        """Adds new data in batches to the accumulator. Each tuple in data_tuples contains (timestamp, sensor_id, new_data)."""
+        async with self.lock:
+            for timestamp, sensor_id, new_data in data_tuples:
+                self.plot_deque.append((timestamp, sensor_id, new_data))
+                self.data_accumulator.append({'Timestamp': timestamp, 'SensorID': sensor_id, 'Data': new_data})
+
     async def update_dataframe(self):
         """Updates the pandas DataFrame with accumulated data."""
         async with self.lock:

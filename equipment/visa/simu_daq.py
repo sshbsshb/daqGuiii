@@ -19,15 +19,24 @@ class simu_daq(VisaEquipment):
         # # Simulate reading voltage (dummy values)
         # print({channel: random() for channel in channels})
 
-        """Simulates reading voltage values from the channels."""
-        for channel in self.channels:
-            voltage = random()  # Simulate a voltage reading
-            timestamp = Timestamp.now()
-            # timestamp = time.time()
-            # Use the AsyncDataManager instance to save the data
-            if self.data_manager:
-                await self.data_manager.add_data(timestamp, f"Channel_{channel}", voltage)
-        # Simulate the delay until the next reading
+        random_floats = [str(random()) for _ in range(101, 197)]
+        # print(random_floats)
+        # Join the float numbers into a string separated by commas
+        random_floats_string = ",".join(random_floats)
+        format_values = [float(val) for val in random_floats_string.split(",")]
+        timestamp = Timestamp.now()
+        data_tuples = [(timestamp, f"Channel_{channel}", voltage) for channel, voltage in zip(channels, format_values)]
+        if self.data_manager:
+            await self.data_manager.add_data_batch(data_tuples)
+        # """Simulates reading voltage values from the channels."""
+        # for channel in self.channels:
+        #     voltage = random()  # Simulate a voltage reading
+        #     timestamp = Timestamp.now()
+        #     # timestamp = time.time()
+        #     # Use the AsyncDataManager instance to save the data
+        #     if self.data_manager:
+        #         await self.data_manager.add_data(timestamp, f"Channel_{channel}", voltage)
+        # # Simulate the delay until the next reading
         # await asyncio.sleep(self.recording_interval)
 
     async def start(self):

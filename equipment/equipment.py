@@ -30,7 +30,7 @@ class VisaEquipment(Equipment):
     def connect(self):
         print(f"Connecting to VISA equipment at {self.address}")
         # Example connection using ResourceManager
-        # self.client = VisaEquipment.rm.open_resource(self.address)
+        self.client = VisaEquipment.rm.open_resource(self.address)
 
     def disconnect(self):
         print("Disconnecting VISA equipment")
