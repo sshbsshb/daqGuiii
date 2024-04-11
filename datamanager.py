@@ -13,6 +13,11 @@ class AsyncDataManager:
         self.data_df = pd.DataFrame(columns=['Timestamp']).set_index('Timestamp')
         self.data_accumulator = []
 
+    def reset_data(self):
+        self.data_accumulator.clear()
+        # self.data_df.iloc[0:0]
+        self.data_df = pd.DataFrame(columns=['Timestamp']).set_index('Timestamp')
+
     async def add_data(self, timestamp, sensor_id, new_data):
         """Adds new data to the accumulator."""
         async with self.lock:

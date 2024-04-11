@@ -53,38 +53,6 @@ async def update_progress_marker():
             print("Progress marker does not exist yet.")
         await asyncio.sleep(1)
 
-
-
-
-
-
-# ## main GUI
-# async def setup_dpg(equipment_list):
-#     dpg.create_context()
-
-#     with dpg.theme() as disabled_theme:
-#         with dpg.theme_component(dpg.mvButton, enabled_state=False):
-#             dpg.add_theme_color(dpg.mvThemeCol_Text, (100, 100, 100), category=dpg.mvThemeCat_Core)
-#     dpg.bind_theme(disabled_theme)
-
-#     with dpg.window(label="Data Visualization", tag="main_window"):
-#         # Create a group for the live plot
-#         with dpg.group(horizontal=True, ):
-#             dpg.add_text("Equipment connected and press start ----->")
-#             dpg.add_button(label="Start", width=75, callback=start_stop_handler, tag="start_stop_button")
-#             dpg.add_button(label="Save", width=75,  callback=save_handler, tag="save_button")
-#         with dpg.group(horizontal=False):
-#             setup_live_plot()
-
-#         with dpg.group(horizontal=False):
-#             setup_progress_plot(equipment_list)
-#     # dpg.show_metrics()
-#     dpg.set_exit_callback(on_attempt_to_close)
-#     dpg.create_viewport(title='Monitoring Dashboard', width=1024, height=850, disable_close=True)
-#     dpg.setup_dearpygui()
-#     dpg.show_viewport()
-#     dpg.set_primary_window("main_window", True)
-
 async def task_monitor(data_manager, equipment_list):
     tasks = []
     while True:
@@ -92,6 +60,7 @@ async def task_monitor(data_manager, equipment_list):
             if not tasks:
                 print("Starting tasks")
                 try:
+                    data_manager.reset_data()
                     tasks.extend([
                         asyncio.create_task(eqpt.start()) for eqpt in equipment_list
                     ])
@@ -117,8 +86,6 @@ async def main():
     gui_manager = GUIManager(equipment_list, data_manager)
     gui_manager.setup()
 
-
-
     # Start monitoring tasks based on app_state
     asyncio.create_task(task_monitor(data_manager, equipment_list))
 
@@ -126,11 +93,6 @@ async def main():
     while dpg.is_dearpygui_running():
         dpg.render_dearpygui_frame()
         await asyncio.sleep(0.016)  # Roughly 60 FPS
-    # await setup_dpg(equipment_list)
-    # # Start rendering in a non-blocking way
-    # while dpg.is_dearpygui_running():
-    #     dpg.render_dearpygui_frame()
-    #     await asyncio.sleep(0.016)  # Roughly 60 FPS
 
     dpg.destroy_context()
 

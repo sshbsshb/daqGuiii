@@ -14,6 +14,7 @@ class GUIManager:
             with dpg.theme_component(dpg.mvButton, enabled_state=False):
                 dpg.add_theme_color(dpg.mvThemeCol_Text, (100, 100, 100), category=dpg.mvThemeCat_Core)
         dpg.bind_theme(disabled_theme)
+
         with dpg.window(label="Data Visualization", tag="main_window"):
             with dpg.group(horizontal=True):
                 dpg.add_text("Equipment connected and press start ----->")
