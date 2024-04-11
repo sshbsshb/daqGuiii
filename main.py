@@ -130,7 +130,7 @@ def setup_dpg(equipment_list):
     dpg.setup_dearpygui()
     dpg.show_viewport()
     dpg.set_primary_window("main_window", True)
-
+    dpg.show_metrics()
     while dpg.is_dearpygui_running():
         try:
             # Check for an update request; use a non-blocking check
