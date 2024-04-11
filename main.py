@@ -169,19 +169,25 @@ async def task_monitor(data_manager, equipment_list):
         if app_state.is_running():
             if not tasks:
                 print("Starting tasks")
-                tasks.extend([
-                    asyncio.create_task(eqpt.start()) for eqpt in equipment_list
-                ])
-                tasks.append(asyncio.create_task(live_plot_updater(data_manager)))
-                tasks.append(asyncio.create_task(update_progress_marker()))
-                tasks.append(asyncio.create_task(data_manager.periodically_update_dataframe(interval=6)))
+                try:
+                    tasks.extend([
+                        asyncio.create_task(eqpt.start()) for eqpt in equipment_list
+                    ])
+                    tasks.append(asyncio.create_task(live_plot_updater(data_manager)))
+                    tasks.append(asyncio.create_task(update_progress_marker()))
+                    tasks.append(asyncio.create_task(data_manager.periodically_update_dataframe()))
+                except Exception as e:
+                    print(f"Error starting tasks: {e}")
         else:
             if tasks:
                 print("Stopping tasks")
-                for task in tasks:
-                    task.cancel()
-                await asyncio.gather(*tasks, return_exceptions=True)
-                tasks.clear()
+                try:
+                    for task in tasks:
+                        task.cancel()
+                    await asyncio.gather(*tasks, return_exceptions=True)
+                    tasks.clear()
+                except Exception as e:
+                    print(f"Error stopping tasks: {e}")
         await asyncio.sleep(1)
 
 ## main logic
@@ -224,8 +230,9 @@ if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-
         print("Caught keyboard interrupt. Exiting...")
+    except Exception as e:
+        print(f"Unexpected error: {e}")
     finally:
         dpg.destroy_context()
 
