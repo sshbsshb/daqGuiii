@@ -122,7 +122,7 @@ async def setup_dpg(data_manager, equipment_list):
 
         with dpg.group(horizontal=False):
             setup_progress_plot(equipment_list)
-
+    dpg.show_metrics()
     dpg.create_viewport(title='Monitoring Dashboard', width=1024, height=850)
     dpg.setup_dearpygui()
     dpg.show_viewport()
