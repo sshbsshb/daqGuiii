@@ -1,1 +1,1 @@
-A new generation of DAQ/PSU control system
+A new generation of DAQ/PSU control system with GUI create by Dear PyGui

@@ -1,8 +1,9 @@
 import asyncio
 from collections import deque
 import pandas as pd
-# from datetime import datetime
+from datetime import datetime
 from state import app_state
+import os
 
 class AsyncDataManager:
     def __init__(self):
@@ -44,3 +45,16 @@ class AsyncDataManager:
             except Exception as e:
                 # Log or handle the error here
                 print(f"Error updating DataFrame: {e}")
+
+    async def save_data(self):
+        await self.update_dataframe()  # Ensure the DataFrame is up to date
+        current_time_str = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        # Ensure the "data" directory exists
+        data_dir = "data"
+        os.makedirs(data_dir, exist_ok=True)
+        file_path = os.path.join(data_dir, f"data_{current_time_str}.csv")
+        try:
+            self.data_df.to_csv(file_path)
+            print(f"Data successfully saved to {file_path}.")
+        except Exception as e:
+            print(f"Error saving data: {e}")
