@@ -174,7 +174,7 @@ async def task_monitor(data_manager, equipment_list):
                     task.cancel()
                 tasks.clear()
         # print("waiting start tasks")
-        await asyncio.sleep(0.1)  # Check every second
+        await asyncio.sleep(1)  # Check every second
 
 ## main logic
 async def asyn_main(data_manager, equipment_list):
