@@ -1,23 +1,12 @@
 from abc import ABC, abstractmethod
 import pyvisa
 
-def expand_ranges(input_string):
-    items = input_string.split(',')
-    full_list = []
-    for item in items:
-        if ':' in item:
-            start, end = item.split(':')
-            full_list.extend(range(int(start), int(end) + 1))
-        else:
-            full_list.append(int(item))
-    return full_list
-
 class Equipment(ABC):
     """Base class for all equipment, enforcing a contract for subclasses."""
-    def __init__(self, name, mode, address):
-        self.name = name
-        self.mode = mode # whether it is daq(acquire data) or psu(receive control)
+    def __init__(self, address, type, schedule):
         self.address = address
+        self.type = type # whether it is daq(acquire data) or psu(receive control)
+        self.schedule = schedule
     
     @abstractmethod
     def connect(self):
@@ -27,14 +16,15 @@ class Equipment(ABC):
     def disconnect(self):
         pass  # Subclasses must implement this method
 
+    @abstractmethod    
     def identify(self):
-        return f"{self.mode} Equipment connected at {self.address}"
+        pass
 
 class VisaEquipment(Equipment):
     # Class variable for ResourceManager
     rm = pyvisa.ResourceManager()
-    def __init__(self, name, mode, address):
-        super().__init__(name, mode, address)  # Call to superclass constructor to set address
+    def __init__(self, address, type, schedule):
+        super().__init__(address, type, schedule)  # Call to superclass constructor to set address
         self.client = None
 
     def connect(self):
@@ -47,6 +37,9 @@ class VisaEquipment(Equipment):
         # Assuming there's a close or similar method to disconnect
         # self.client.close()
 
+    def identify(self):
+        return "VISA Equipment"
+
 class ModbusEquipment(Equipment):
     def connect(self):
         print(f"Connecting to Modbus equipment at {self.address}")
@@ -54,6 +47,8 @@ class ModbusEquipment(Equipment):
     def disconnect(self):
         print("Disconnecting Modbus equipment")
 
+    def identify(self):
+        return "Modbus Equipment"
 
 # Example subclass for a specific type of equipment
 class Daq(VisaEquipment):

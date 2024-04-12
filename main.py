@@ -11,12 +11,8 @@ from gui_manager import GUIManager
 from datamanager import AsyncDataManager
 from schedule import ConstantIntervalSchedule, CsvSchedule
 
-## config file
-def load_config(filename):
-    with open(filename, 'r') as file:
-        return yaml.safe_load(file)
 
-### GUI---realtime plot
+## GUI---realtime plot
 def update_live_plot(data_manager):
     # Ensure there's data to plot
     if not data_manager.plot_deque:
@@ -53,6 +49,7 @@ async def update_progress_marker():
             print("Progress marker does not exist yet.")
         await asyncio.sleep(1)
 
+## add async tasks
 async def task_monitor(data_manager, equipment_list):
     tasks = []
     while True:
@@ -81,6 +78,28 @@ async def task_monitor(data_manager, equipment_list):
                     print(f"Error stopping tasks: {e}")
         await asyncio.sleep(1)
 
+## config file
+def load_config(filename):
+    with open(filename, 'r') as file:
+        return yaml.safe_load(file)
+
+def load_equipment():
+    for eq_config in config['equipment']:
+        # Example for determining which schedule to use based on config
+        if 'sample_rate' in eq_config['schedule']:
+            schedule = ConstantIntervalSchedule(1/eq_config['schedule']['sample_rate'])
+        elif 'schedule_csv' in eq_config['schedule']:
+            schedule = CsvSchedule(eq_config['schedule']['schedule_csv'])
+        else:
+            schedule = None
+
+        # Dynamic class loading based on the equipment type
+        module_path = f"equipment.{eq_config['connection']['mode'].lower()}.{eq_config['class'].lower()}"
+        module = importlib.import_module(module_path)
+        class_ = getattr(module, eq_config['class'])
+        equipment_instance = class_(name=eq_config['name'], connection=eq_config['connection'], settings=eq_config['settings'], schedule=schedule, data_manager=data_manager)
+        equipment_list.append(equipment_instance)
+
 ## main logic
 async def main():
     gui_manager = GUIManager(equipment_list, data_manager)
@@ -99,25 +118,10 @@ async def main():
 if __name__ == "__main__":
     # Initial setup
     data_manager = AsyncDataManager()
+    equipment_list = []
 
     config = load_config('config.yaml')
-    equipment_list = []
- 
-    for eq_config in config['equipment']:
-        # Example for determining which schedule to use based on config
-        if 'sample_rate' in eq_config['specific_parameters']:
-            schedule = ConstantIntervalSchedule(1/eq_config['specific_parameters']['sample_rate'])
-        elif 'schedule_csv' in eq_config['specific_parameters']:
-            schedule = CsvSchedule(eq_config['specific_parameters']['schedule_csv'])
-        else:
-            schedule = None
-
-        # Dynamic class loading based on the equipment type
-        module_path = f"equipment.{eq_config['connection'].lower()}.{eq_config['class'].lower()}"
-        module = importlib.import_module(module_path)
-        class_ = getattr(module, eq_config['class'])
-        equipment_instance = class_(name=eq_config['name'], config=eq_config, schedule=schedule, data_manager=data_manager)
-        equipment_list.append(equipment_instance)
+    load_equipment()
 
     try:
         asyncio.run(main())

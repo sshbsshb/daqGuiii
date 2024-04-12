@@ -1,23 +1,58 @@
 total_run_time: 3600
 equipment:
-- address: GPIB0::23::INSTR
-  name: keysight
-  connection: VISA
-  class: simu_daq
-  specific_parameters:
-    channels:
-    - 1
-    - 2
-    - 3
-    sample_rate: 1
+- name: keysight
+  class: KeysightDAQ #class file
   type: DAQ
-- address: 192.168.1.100
-  name: ke
-  connection: Modbus
+  connection:
+    mode: VISA
+    address: GPIB0::23::INSTR
+  schedule:
+    sample_rate: 1
+  settings:
+    channels:
+        - channel: "101"
+          measurement: "TEMP:TC"
+          sensor_type: "K"
+          remark: "TC K-type temperature"
+        - channel: "102:103"
+          measurement: "TEMP:TC"
+          sensor_type: "T"
+          remark: "TC T-type temperature"
+        - channel: "104:105"
+          measurement: "RES"
+          sensor_type: "AUTO"
+          remark: "resistance"
+- name: simu_daq
+  class: simu_daq
+  type: DAQ
+  connection:
+    mode: VISA
+    address: GPIB0::23::INSTR
+  schedule:
+    sample_rate: 1
+  settings:
+    channels:
+        - channel: "101"
+          measurement: "TEMP:TC"
+          sensor_type: "K"
+          remark: "TC K-type temperature"
+        - channel: "102:103"
+          measurement: "TEMP:TC"
+          sensor_type: "T"
+          remark: "TC T-type temperature"
+        - channel: "104:105"
+          measurement: "RES"
+          sensor_type: "AUTO"
+          remark: "resistance"
+- name: ke
   class: simu_psu
-  port: 502
-  specific_parameters:
+  type: PowerSupply
+  connection:
+    mode: Modbus
+    address: 192.168.1.100
+    port: 502
+  schedule:
+    schedule_csv: data.csv
+  settings:
     max_current: 5
     max_voltage: 30
-    schedule_csv: data.csv
-  type: PowerSupply
