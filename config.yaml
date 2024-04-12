@@ -7,7 +7,8 @@ equipment:
     mode: VISA
     address: GPIB0::23::INSTR
   schedule:
-    sample_rate: 1
+    # sample_rate: 1
+    schedule_csv: data.csv
   settings:
     channels:
         - channel: "101"
@@ -29,18 +30,18 @@ equipment:
     mode: VISA
     address: GPIB0::23::INSTR
   schedule:
-    sample_rate: 1
+    schedule_csv: data1.csv
   settings:
     channels:
-        - channel: "101"
+        - channel: "201"
           measurement: "TEMP:TC"
           sensor_type: "K"
           remark: "TC K-type temperature"
-        - channel: "102:103"
+        - channel: "202:203"
           measurement: "TEMP:TC"
           sensor_type: "T"
           remark: "TC T-type temperature"
-        - channel: "104:105"
+        - channel: "204:205"
           measurement: "RES"
           sensor_type: "AUTO"
           remark: "resistance"
@@ -56,3 +57,12 @@ equipment:
   settings:
     max_current: 5
     max_voltage: 30
+- name: ka3005
+  class: Ka3005PSU
+  type: PowerSupply
+  connection:
+    mode: VISA
+    address: ASRL3::INSTR
+  schedule:
+    schedule_csv: data.csv
+  settings:

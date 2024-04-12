@@ -41,17 +41,16 @@ class KeysightDAQ(VisaEquipment):
         scan_list =  expand_ranges(scan_list_str)
         return scan_list
     
-    async def read_channels(self):
-        # print({channel: random() for channel in channels})
-        # reading = self.client.query(':READ?')
-        reading = "101, 102, 103, 104, 105"
-        # time.sleep(0.5)
-        format_values = [float(val) for val in reading.split(",")]
-        timestamp = Timestamp.now()
-        data_tuples = [(timestamp, f"Channel_{channel}", voltage) for channel, voltage in zip(self.scan_list, format_values)]
-        if self.data_manager:
-            await self.data_manager.add_data_batch(data_tuples)
-
+    async def read_channels(self, value=1):
+        for _ in range(round(value)): ## if csv schedule, can record "value" points of data
+            reading = ",".join([str(random()) for _ in self.scan_list])
+            # reading = self.client.query(':READ?')
+            format_values = [float(val) for val in reading.split(",")]
+            timestamp = Timestamp.now()
+            data_tuples = [(timestamp, f"Channel_{channel}", voltage) for channel, voltage in zip(self.scan_list, format_values)]
+            if self.data_manager:
+                await self.data_manager.add_data_batch(data_tuples)
+            # await asyncio.sleep(1) # wait for 1 sec for next round of data
     async def start(self):
         if self.schedule:
             await self.schedule.setup_schedule(self.read_channels)

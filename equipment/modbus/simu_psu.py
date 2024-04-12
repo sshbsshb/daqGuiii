@@ -2,9 +2,9 @@
 from ..equipment import VisaEquipment
 
 class simu_psu(VisaEquipment):
-    def __init__(self, address='"asrt::23::INSTR"', schedule=None, type = 'psu', name='simu_psu', *args, **kwargs):
-        super().__init__(address, type, schedule)
-        self.name = name
+    def __init__(self, name, connection, settings=None, schedule=None, *args, **kwargs):
+        self.connection = connection
+        super().__init__(name, self.connection['mode'], self.connection['address'])  # Initialize the VisaEquipment part of this object
         self.schedule = schedule
 
     async def set_voltage(self, value=1):
@@ -15,6 +15,5 @@ class simu_psu(VisaEquipment):
         if self.schedule:
             await self.schedule.setup_schedule(self.set_voltage)
 
-    
     async def perform_task(self):
         print(f"{self.name} performing its task.")

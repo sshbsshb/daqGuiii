@@ -42,6 +42,7 @@ class GUIManager:
     
     def saving_data(self):
         asyncio.run(self.data_manager.save_data())
+
     ### GUI---Start button
     def save_handler(self, sender, app_data, user_data):
         print("saving....")
@@ -49,9 +50,9 @@ class GUIManager:
 
     ### GUI---Exit button
     def exit_handler(self):
-        print("Saving data before exit...")
-        # Add your data saving logic here.
+        app_state.stop()
         dpg.stop_dearpygui()
+
     def show_exit_confirmation_modal(self):
         if not dpg.does_item_exist("exit_confirmation_modal"):
             with dpg.window(label="Confirm Exit", modal=True, no_close=True, tag="exit_confirmation_modal"):

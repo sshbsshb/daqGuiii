@@ -26,27 +26,27 @@ class simu_daq(VisaEquipment):
         scan_list =  expand_ranges(scan_list_str)
         return scan_list
 
-    async def read_channels(self):
+    async def read_channels(self, value=1):
         # # Simulate reading voltage (dummy values)
         # print({channel: random() for channel in channels})
-
-        random_floats = [str(random()) for _ in self.scan_list]
-        # print(random_floats)
-        # Join the float numbers into a string separated by commas
-        random_floats_string = ",".join(random_floats)
-        format_values = [float(val) for val in random_floats_string.split(",")]
-        timestamp = Timestamp.now()
-        data_tuples = [(timestamp, f"Channel1_{channel}", voltage) for channel, voltage in zip(self.scan_list, format_values)]
-        if self.data_manager:
-            await self.data_manager.add_data_batch(data_tuples)
-        # """Simulates reading voltage values from the channels."""
-        # for channel in self.channels:
-        #     voltage = random()  # Simulate a voltage reading
-        #     timestamp = Timestamp.now()
-        #     # timestamp = time.time()
-        #     # Use the AsyncDataManager instance to save the data
-        #     if self.data_manager:
-        #         await self.data_manager.add_data(timestamp, f"Channel_{channel}", voltage)
+        for _ in range(round(value)): ## if csv schedule, can record "value" points of data
+            random_floats = [str(random()) for _ in self.scan_list]
+            # print(random_floats)
+            # Join the float numbers into a string separated by commas
+            random_floats_string = ",".join(random_floats)
+            format_values = [float(val) for val in random_floats_string.split(",")]
+            timestamp = Timestamp.now()
+            data_tuples = [(timestamp, f"Channel_{channel}", voltage) for channel, voltage in zip(self.scan_list, format_values)]
+            if self.data_manager:
+                await self.data_manager.add_data_batch(data_tuples)
+            # """Simulates reading voltage values from the channels."""
+            # for channel in self.channels:
+            #     voltage = random()  # Simulate a voltage reading
+            #     timestamp = Timestamp.now()
+            #     # timestamp = time.time()
+            #     # Use the AsyncDataManager instance to save the data
+            #     if self.data_manager:
+            #         await self.data_manager.add_data(timestamp, f"Channel_{channel}", voltage)
 
 
     async def start(self):

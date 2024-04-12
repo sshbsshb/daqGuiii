@@ -52,7 +52,7 @@ class AsyncDataManager:
                 await self.update_dataframe()
             except asyncio.CancelledError:
                 # Handle task cancellation
-                print("Periodic update was cancelled.")
+                # print("Periodic update was cancelled.")
                 break
             except Exception as e:
                 # Log or handle the error here

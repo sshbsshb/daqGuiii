@@ -55,7 +55,7 @@ async def task_monitor(data_manager, equipment_list):
     while True:
         if app_state.is_running():
             if not tasks:
-                print("Starting tasks")
+                # print("Starting tasks")
                 try:
                     data_manager.reset_data()
                     tasks.extend([
