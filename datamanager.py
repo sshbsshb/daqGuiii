@@ -44,7 +44,7 @@ class AsyncDataManager:
                 # Reset the accumulator
                 self.data_accumulator.clear()
 
-    async def periodically_update_dataframe(self, interval=60):
+    async def periodically_update_dataframe(self, interval=5):
         """Periodically calls update_dataframe at the specified interval (in seconds)."""
         while app_state.is_running():
             try:

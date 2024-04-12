@@ -17,7 +17,7 @@ class GUIManager:
 
         with dpg.window(label="Data Visualization", tag="main_window"):
             with dpg.group(horizontal=True):
-                dpg.add_text("Equipment connected and press start ----->")
+                dpg.add_text("Equipment connected and press start ----->", tag="info_text")
                 dpg.add_button(label="Start", width=75, callback=self.start_stop_handler, tag="start_stop_button")
                 dpg.add_button(label="Save", width=75, callback=self.save_handler, tag="save_button")
             with dpg.group(horizontal=False):
@@ -43,9 +43,9 @@ class GUIManager:
     def saving_data(self):
         asyncio.run(self.data_manager.save_data())
 
-    ### GUI---Start button
+    ### GUI---Save button
     def save_handler(self, sender, app_data, user_data):
-        print("saving....")
+        # print("saving....")
         self.saving_data()
 
     ### GUI---Exit button

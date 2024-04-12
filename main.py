@@ -49,6 +49,19 @@ async def update_progress_marker():
             print("Progress marker does not exist yet.")
         await asyncio.sleep(1)
 
+## stop entire system after long time as a precaution
+async def overall_time_limit_reached():
+    await asyncio.sleep(config['overall_time_limit'])
+    # Here, you could stop data acquisition and plotting
+    print("Overall time limit reached. Stopping...")
+    # Optionally save data here or trigger any cleanup routines
+    app_state.stop()
+    # await data_manager.save_data()
+
+    dpg.set_value('info_text', "Overall time limit reached. Stopping...")
+
+
+
 ## add async tasks
 async def task_monitor(data_manager, equipment_list):
     tasks = []
@@ -64,6 +77,7 @@ async def task_monitor(data_manager, equipment_list):
                     tasks.append(asyncio.create_task(live_plot_updater(data_manager)))
                     tasks.append(asyncio.create_task(update_progress_marker()))
                     tasks.append(asyncio.create_task(data_manager.periodically_update_dataframe()))
+                    tasks.append(asyncio.create_task(overall_time_limit_reached()))
                 except Exception as e:
                     print(f"Error starting tasks: {e}")
         else:

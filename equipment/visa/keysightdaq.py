@@ -50,7 +50,8 @@ class KeysightDAQ(VisaEquipment):
             data_tuples = [(timestamp, f"Channel_{channel}", voltage) for channel, voltage in zip(self.scan_list, format_values)]
             if self.data_manager:
                 await self.data_manager.add_data_batch(data_tuples)
-            # await asyncio.sleep(1) # wait for 1 sec for next round of data
+            if  value > 1:
+                await asyncio.sleep(0.5) # wait for 0.5 sec for next round of data
     async def start(self):
         if self.schedule:
             await self.schedule.setup_schedule(self.read_channels)

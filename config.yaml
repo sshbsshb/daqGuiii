@@ -1,4 +1,4 @@
-total_run_time: 3600
+overall_time_limit: 5000 #28800 # 8 hours in second
 equipment:
 - name: keysight
   class: KeysightDAQ #class file
@@ -7,8 +7,8 @@ equipment:
     mode: VISA
     address: GPIB0::23::INSTR
   schedule:
-    # sample_rate: 1
-    schedule_csv: data.csv
+    sample_rate: 1
+    # schedule_csv: data.csv
   settings:
     channels:
         - channel: "101"
@@ -23,28 +23,28 @@ equipment:
           measurement: "RES"
           sensor_type: "AUTO"
           remark: "resistance"
-- name: simu_daq
-  class: simu_daq
-  type: DAQ
-  connection:
-    mode: VISA
-    address: GPIB0::23::INSTR
-  schedule:
-    schedule_csv: data1.csv
-  settings:
-    channels:
-        - channel: "201"
-          measurement: "TEMP:TC"
-          sensor_type: "K"
-          remark: "TC K-type temperature"
-        - channel: "202:203"
-          measurement: "TEMP:TC"
-          sensor_type: "T"
-          remark: "TC T-type temperature"
-        - channel: "204:205"
-          measurement: "RES"
-          sensor_type: "AUTO"
-          remark: "resistance"
+# - name: simu_daq
+#   class: simu_daq
+#   type: DAQ
+#   connection:
+#     mode: VISA
+#     address: GPIB0::23::INSTR
+#   schedule:
+#     schedule_csv: data1.csv
+#   settings:
+#     channels:
+#         - channel: "201"
+#           measurement: "TEMP:TC"
+#           sensor_type: "K"
+#           remark: "TC K-type temperature"
+#         - channel: "202:203"
+#           measurement: "TEMP:TC"
+#           sensor_type: "T"
+#           remark: "TC T-type temperature"
+#         - channel: "204:205"
+#           measurement: "RES"
+#           sensor_type: "AUTO"
+#           remark: "resistance"
 - name: ke
   class: simu_psu
   type: PowerSupply
@@ -57,12 +57,12 @@ equipment:
   settings:
     max_current: 5
     max_voltage: 30
-- name: ka3005
-  class: Ka3005PSU
-  type: PowerSupply
-  connection:
-    mode: VISA
-    address: ASRL3::INSTR
-  schedule:
-    schedule_csv: data.csv
-  settings:
+# - name: ka3005
+#   class: Ka3005PSU
+#   type: PowerSupply
+#   connection:
+#     mode: VISA
+#     address: ASRL3::INSTR
+#   schedule:
+#     schedule_csv: data.csv
+#   settings:
