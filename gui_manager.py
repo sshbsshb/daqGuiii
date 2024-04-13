@@ -104,7 +104,7 @@ class GUIManager:
             print(f"Error while creating progress plot: {e}")
 
     ### GUI---Start button
-    def start_stop_handler(self,sender, app_data, user_data):
+    def start_stop_handler(self, sender, app_data, user_data):
         current_label = dpg.get_item_label(sender)
 
         if current_label == "Start":

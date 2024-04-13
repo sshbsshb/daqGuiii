@@ -1,4 +1,4 @@
-overall_time_limit: 5000 #28800 # 8 hours in second
+overall_time_limit: 28800 # 8 hours in second
 equipment:
 - name: keysight
   class: KeysightDAQ #class file
@@ -11,40 +11,41 @@ equipment:
     # schedule_csv: data.csv
   settings:
     channels:
-        - channel: "101"
-          measurement: "TEMP:TC"
-          sensor_type: "K"
-          remark: "TC K-type temperature"
-        - channel: "102:103"
+        - channel: "101:105"
           measurement: "TEMP:TC"
           sensor_type: "T"
           remark: "TC T-type temperature"
-        - channel: "104:105"
+        - channel: "106:108"
+          measurement: "TEMP:TC"
+          sensor_type: "T"
+          remark: "TC T-type temperature"
+        - channel: "109:115"
           measurement: "RES"
           sensor_type: "AUTO"
           remark: "resistance"
-# - name: simu_daq
-#   class: simu_daq
-#   type: DAQ
-#   connection:
-#     mode: VISA
-#     address: GPIB0::23::INSTR
-#   schedule:
-#     schedule_csv: data1.csv
-#   settings:
-#     channels:
-#         - channel: "201"
-#           measurement: "TEMP:TC"
-#           sensor_type: "K"
-#           remark: "TC K-type temperature"
-#         - channel: "202:203"
-#           measurement: "TEMP:TC"
-#           sensor_type: "T"
-#           remark: "TC T-type temperature"
-#         - channel: "204:205"
-#           measurement: "RES"
-#           sensor_type: "AUTO"
-#           remark: "resistance"
+- name: simu_daq
+  class: simu_daq
+  type: DAQ
+  connection:
+    mode: VISA
+    address: GPIB0::23::INSTR
+  schedule:
+    sample_rate: 2
+    # schedule_csv: data1.csv
+  settings:
+    channels:
+        - channel: "201"
+          measurement: "TEMP:TC"
+          sensor_type: "K"
+          remark: "TC K-type temperature"
+        - channel: "202:203"
+          measurement: "TEMP:TC"
+          sensor_type: "T"
+          remark: "TC T-type temperature"
+        - channel: "204:205"
+          measurement: "RES"
+          sensor_type: "AUTO"
+          remark: "resistance"
 - name: ke
   class: simu_psu
   type: PowerSupply

@@ -8,28 +8,28 @@ import os
 class AsyncDataManager:
     def __init__(self):
         self.lock = asyncio.Lock()
-        self.plot_deque = deque(maxlen=1000)
-        # Initialize DataFrame with 'Timestamp' as the index this time
-        self.data_df = pd.DataFrame(columns=['Timestamp']).set_index('Timestamp')
+        self.plot_deque = deque(maxlen=100)
+        # If initial df with columns will create future warning in the concatenate
+        self.data_df = pd.DataFrame() # pd.DataFrame(columns=['Timestamp', 'Name', 'Channel', 'Data']).set_index(['Timestamp', 'Name'])
         self.data_accumulator = []
 
     def reset_data(self):
         self.data_accumulator.clear()
         # self.data_df.iloc[0:0]
-        self.data_df = pd.DataFrame(columns=['Timestamp']).set_index('Timestamp')
+        self.data_df = pd.DataFrame() # pd.DataFrame(columns=['Timestamp', 'Name', 'Channel', 'Data']).set_index(['Timestamp', 'Name'])
 
-    async def add_data(self, timestamp, sensor_id, new_data):
+    async def add_data(self, timestamp, name, channel, new_data):
         """Adds new data to the accumulator."""
         async with self.lock:
-            self.plot_deque.append((timestamp, sensor_id, new_data))
-            self.data_accumulator.append({'Timestamp': timestamp, 'SensorID': sensor_id, 'Data': new_data})
+            self.plot_deque.append((timestamp, name, channel, new_data))
+            self.data_accumulator.append({'Timestamp': timestamp, 'Name':name, 'Channel': channel, 'Data': new_data})
 
     async def add_data_batch(self, data_tuples):
         """Adds new data in batches to the accumulator. Each tuple in data_tuples contains (timestamp, sensor_id, new_data)."""
         async with self.lock:
-            for timestamp, sensor_id, new_data in data_tuples:
-                self.plot_deque.append((timestamp, sensor_id, new_data))
-                self.data_accumulator.append({'Timestamp': timestamp, 'SensorID': sensor_id, 'Data': new_data})
+            for timestamp, name, channel, new_data in data_tuples:
+                self.plot_deque.append((timestamp, name, channel, new_data))
+                self.data_accumulator.append({'Timestamp': timestamp, 'Name':name, 'Channel': channel, 'Data': new_data})
 
     async def update_dataframe(self):
         """Updates the pandas DataFrame with accumulated data."""
@@ -37,10 +37,13 @@ class AsyncDataManager:
             if self.data_accumulator:
                 # Convert accumulated data to DataFrame
                 new_df = pd.DataFrame(self.data_accumulator)
-                # Pivot new data to have 'Timestamp' as index and sensor IDs as columns
-                new_df = new_df.pivot(index='Timestamp', columns='SensorID', values='Data')
-                # Concatenate the new DataFrame with the existing one
-                self.data_df = pd.concat([self.data_df, new_df], axis=0).sort_index().ffill()
+                new_df.set_index(['Timestamp', 'Name'], inplace=True)
+                # Filter out all-NA rows
+                new_df = new_df.dropna(how='all')
+                if not new_df.empty:
+                    # Concatenate while ensuring we don't introduce or propagate NA unnecessarily
+                    # self.data_df = pd.concat([self.data_df, new_df], axis=0).sort_index().fillna(method='ffill')
+                    self.data_df = pd.concat([self.data_df, new_df], axis=0).sort_index().ffill()
                 # Reset the accumulator
                 self.data_accumulator.clear()
 
@@ -52,7 +55,7 @@ class AsyncDataManager:
                 await self.update_dataframe()
             except asyncio.CancelledError:
                 # Handle task cancellation
-                # print("Periodic update was cancelled.")
+                print("Periodic update was cancelled.")
                 break
             except Exception as e:
                 # Log or handle the error here

@@ -36,7 +36,7 @@ class simu_daq(VisaEquipment):
             random_floats_string = ",".join(random_floats)
             format_values = [float(val) for val in random_floats_string.split(",")]
             timestamp = Timestamp.now()
-            data_tuples = [(timestamp, f"Channel_{channel}", voltage) for channel, voltage in zip(self.scan_list, format_values)]
+            data_tuples = [(timestamp, self.name, f"Channel_{channel}", voltage) for channel, voltage in zip(self.scan_list, format_values)]
             if self.data_manager:
                 await self.data_manager.add_data_batch(data_tuples)
             # """Simulates reading voltage values from the channels."""
@@ -46,7 +46,7 @@ class simu_daq(VisaEquipment):
             #     # timestamp = time.time()
             #     # Use the AsyncDataManager instance to save the data
             #     if self.data_manager:
-            #         await self.data_manager.add_data(timestamp, f"Channel_{channel}", voltage)
+            #         await self.data_manager.add_data(timestamp, self.name, f"Channel_{channel}", voltage)
 
 
     async def start(self):

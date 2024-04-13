@@ -19,15 +19,15 @@ def update_live_plot(data_manager):
         return
 
     # Assuming the plot and axes have been created previously, and we're just updating the series
-    sensor_ids = {sensor_id for _, sensor_id, _ in data_manager.plot_deque}
-    for sensor_id in sensor_ids:
-        data_x, data_y = zip(*[(dt.timestamp(), data) for dt, sid, data in data_manager.plot_deque if sid == sensor_id])
+    channels = {channel for _, _, channel, _ in data_manager.plot_deque}
+    for channel in channels:
+        data_x, data_y = zip(*[(dt.timestamp(), data) for dt, _, sid, data in data_manager.plot_deque if sid == channel])
 
         # Check for existing series; update if exists, else create
-        series_tag = f"line_{sensor_id}"
+        series_tag = f"line_{channel}"
         if not dpg.does_item_exist(series_tag):
             # Assuming 'y_axis' is the tag for your Y axis where series should be added
-            dpg.add_line_series(list(data_x), list(data_y), parent="y_axis", label=sensor_id, tag=series_tag)
+            dpg.add_line_series(list(data_x), list(data_y), parent="y_axis", label=channel, tag=series_tag)
         else:
             dpg.configure_item(series_tag, x=list(data_x), y=list(data_y))
         dpg.fit_axis_data("y_axis")
@@ -56,11 +56,11 @@ async def overall_time_limit_reached():
     print("Overall time limit reached. Stopping...")
     # Optionally save data here or trigger any cleanup routines
     app_state.stop()
-    # await data_manager.save_data()
-
+    await data_manager.save_data()
+    # return the start button
+    dpg.set_item_label("start_stop_button", "Start")
+    dpg.enable_item("save_button")
     dpg.set_value('info_text', "Overall time limit reached. Stopping...")
-
-
 
 ## add async tasks
 async def task_monitor(data_manager, equipment_list):
@@ -71,6 +71,7 @@ async def task_monitor(data_manager, equipment_list):
                 # print("Starting tasks")
                 try:
                     data_manager.reset_data()
+                    # dpg.delete_item("y_axis", children_only=True, slot=1) # can not delete plot..
                     tasks.extend([
                         asyncio.create_task(eqpt.start()) for eqpt in equipment_list
                     ])

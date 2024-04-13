@@ -47,7 +47,7 @@ class KeysightDAQ(VisaEquipment):
             # reading = self.client.query(':READ?')
             format_values = [float(val) for val in reading.split(",")]
             timestamp = Timestamp.now()
-            data_tuples = [(timestamp, f"Channel_{channel}", voltage) for channel, voltage in zip(self.scan_list, format_values)]
+            data_tuples = [(timestamp, self.name, f"Channel_{channel}", voltage) for channel, voltage in zip(self.scan_list, format_values)]
             if self.data_manager:
                 await self.data_manager.add_data_batch(data_tuples)
             if  value > 1:
