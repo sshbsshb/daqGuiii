@@ -51,13 +51,13 @@ async def update_progress_marker():
         await asyncio.sleep(1)
 
 ## stop entire system after long time as a precaution
-async def overall_time_limit_reached(overall_time_limit, gui_manager):
+async def overall_time_limit_reached(data_manager, overall_time_limit, gui_manager):
     await asyncio.sleep(overall_time_limit) #config['overall_time_limit']
     # Here, you could stop data acquisition and plotting
     print("Overall time limit reached. Stopping...")
     # Optionally save data here or trigger any cleanup routines
     gui_manager.start_stop_action("Stop")
-    gui_manager.saving_data_action()
+    asyncio.create_task(data_manager.save_data())
     # return the start button
 
 ## add async tasks
@@ -76,7 +76,7 @@ async def task_monitor(data_manager, eqpt_manager, gui_manager):
                     tasks.append(asyncio.create_task(live_plot_updater(data_manager)))
                     tasks.append(asyncio.create_task(update_progress_marker()))
                     tasks.append(asyncio.create_task(data_manager.periodically_update_dataframe()))
-                    tasks.append(asyncio.create_task(overall_time_limit_reached(eqpt_manager.config['overall_time_limit'], gui_manager)))
+                    tasks.append(asyncio.create_task(overall_time_limit_reached(data_manager, eqpt_manager.config['overall_time_limit'], gui_manager)))
                 except Exception as e:
                     print(f"Error starting tasks: {e}")
         else:
