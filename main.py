@@ -91,7 +91,7 @@ async def task_monitor(data_manager, eqpt_manager, gui_manager):
                     tasks.clear()
                 except Exception as e:
                     print(f"Error stopping tasks: {e}")
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.5)
 
 ## config file
 def load_config(filename):

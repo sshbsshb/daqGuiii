@@ -41,7 +41,7 @@ class GUIManager:
             dpg.add_plot_axis(dpg.mvYAxis, label="Data", tag="y_axis")
     
     def saving_data_action(self):
-        asyncio.create_task(self.data_manager.save_data())
+        asyncio.run(self.data_manager.save_data())
 
     ### GUI---Save button
     def save_handler(self, sender, app_data, user_data):
