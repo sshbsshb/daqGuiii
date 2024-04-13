@@ -13,9 +13,10 @@ class KeysightDAQ(VisaEquipment):
         self.channels = settings['channels']
         self.data_manager = data_manager  # Store the AsyncDataManager instance
         self.scan_list = []
-        if asyncio.run(self.reset_Daq()):
-            self.scan_list = asyncio.run(self.setup_channels(self.channels))
-        print(self.scan_list)
+
+    async def initialize(self):
+        await self.reset_Daq()
+        self.scan_list = await self.setup_channels(self.channels)
 
     async def reset_Daq(self):
         # self.client.write("*RST")
@@ -52,9 +53,12 @@ class KeysightDAQ(VisaEquipment):
                 await self.data_manager.add_data_batch(data_tuples)
             if  value > 1:
                 await asyncio.sleep(0.5) # wait for 0.5 sec for next round of data
+
     async def start(self):
         if self.schedule:
             await self.schedule.setup_schedule(self.read_channels)
-    
-    async def perform_task(self):
-        print(f"{self.name} performing its task.")
+
+    async def stop(self):
+        # self.client.write('VSET1:0')
+        print("keysight stopped")
+        return True

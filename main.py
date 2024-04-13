@@ -1,5 +1,5 @@
 import yaml
-import importlib
+
 import time
 import asyncio
 from asyncio import Event
@@ -8,7 +8,8 @@ import dearpygui.dearpygui as dpg
 
 from state import app_state
 from gui_manager import GUIManager
-from datamanager import AsyncDataManager
+from data_manager import AsyncDataManager
+from equipment_manager import EquipmentManager
 from schedule import ConstantIntervalSchedule, CsvSchedule
 
 
@@ -50,20 +51,17 @@ async def update_progress_marker():
         await asyncio.sleep(1)
 
 ## stop entire system after long time as a precaution
-async def overall_time_limit_reached():
-    await asyncio.sleep(config['overall_time_limit'])
+async def overall_time_limit_reached(overall_time_limit, gui_manager):
+    await asyncio.sleep(overall_time_limit) #config['overall_time_limit']
     # Here, you could stop data acquisition and plotting
     print("Overall time limit reached. Stopping...")
     # Optionally save data here or trigger any cleanup routines
-    app_state.stop()
-    await data_manager.save_data()
+    gui_manager.start_stop_action("Stop")
+    gui_manager.saving_data_action()
     # return the start button
-    dpg.set_item_label("start_stop_button", "Start")
-    dpg.enable_item("save_button")
-    dpg.set_value('info_text', "Overall time limit reached. Stopping...")
 
 ## add async tasks
-async def task_monitor(data_manager, equipment_list):
+async def task_monitor(data_manager, eqpt_manager, gui_manager):
     tasks = []
     while True:
         if app_state.is_running():
@@ -73,18 +71,20 @@ async def task_monitor(data_manager, equipment_list):
                     data_manager.reset_data()
                     # dpg.delete_item("y_axis", children_only=True, slot=1) # can not delete plot..
                     tasks.extend([
-                        asyncio.create_task(eqpt.start()) for eqpt in equipment_list
+                        asyncio.create_task(eqpt.start()) for eqpt in eqpt_manager.equipment_list
                     ])
                     tasks.append(asyncio.create_task(live_plot_updater(data_manager)))
                     tasks.append(asyncio.create_task(update_progress_marker()))
                     tasks.append(asyncio.create_task(data_manager.periodically_update_dataframe()))
-                    tasks.append(asyncio.create_task(overall_time_limit_reached()))
+                    tasks.append(asyncio.create_task(overall_time_limit_reached(eqpt_manager.config['overall_time_limit'], gui_manager)))
                 except Exception as e:
                     print(f"Error starting tasks: {e}")
         else:
             if tasks:
                 print("Stopping tasks")
                 try:
+                    await eqpt_manager.stop_equipment()
+                    # asyncio.create_task(eqpt_manager.stop_equipment())
                     for task in tasks:
                         task.cancel()
                     await asyncio.gather(*tasks, return_exceptions=True)
@@ -95,33 +95,24 @@ async def task_monitor(data_manager, equipment_list):
 
 ## config file
 def load_config(filename):
+    """Load configuration from a YAML file."""
     with open(filename, 'r') as file:
         return yaml.safe_load(file)
 
-def load_equipment():
-    for eq_config in config['equipment']:
-        # Example for determining which schedule to use based on config
-        if 'sample_rate' in eq_config['schedule']:
-            schedule = ConstantIntervalSchedule(1/eq_config['schedule']['sample_rate'])
-        elif 'schedule_csv' in eq_config['schedule']:
-            schedule = CsvSchedule(eq_config['schedule']['schedule_csv'])
-        else:
-            schedule = None
-
-        # Dynamic class loading based on the equipment type
-        module_path = f"equipment.{eq_config['connection']['mode'].lower()}.{eq_config['class'].lower()}"
-        module = importlib.import_module(module_path)
-        class_ = getattr(module, eq_config['class'])
-        equipment_instance = class_(name=eq_config['name'], connection=eq_config['connection'], settings=eq_config['settings'], schedule=schedule, data_manager=data_manager)
-        equipment_list.append(equipment_instance)
-
 ## main logic
 async def main():
-    gui_manager = GUIManager(equipment_list, data_manager)
+        # Initial setup
+    config = load_config('config.yaml')
+    data_manager = AsyncDataManager()
+    eqpt_manager = EquipmentManager(config)
+    eqpt_manager.load_equipment(data_manager)
+    await eqpt_manager.initialize_equipment()
+
+    gui_manager = GUIManager(eqpt_manager, data_manager)
     gui_manager.setup()
 
     # Start monitoring tasks based on app_state
-    asyncio.create_task(task_monitor(data_manager, equipment_list))
+    asyncio.create_task(task_monitor(data_manager, eqpt_manager, gui_manager))
 
     # Start rendering in a non-blocking way
     while dpg.is_dearpygui_running():
@@ -131,13 +122,6 @@ async def main():
     dpg.destroy_context()
 
 if __name__ == "__main__":
-    # Initial setup
-    data_manager = AsyncDataManager()
-    equipment_list = []
-
-    config = load_config('config.yaml')
-    load_equipment()
-
     try:
         asyncio.run(main())
     except KeyboardInterrupt:

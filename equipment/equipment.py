@@ -27,6 +27,13 @@ class Equipment(ABC):
     def disconnect(self):
         pass  # Subclasses must implement this method
 
+    @abstractmethod
+    def stop(self):
+        pass  # Subclasses must implement this method
+
+    def initialize(self):
+        pass
+
     def identify(self):
         return f"{self.mode} Equipment connected at {self.address}"
 

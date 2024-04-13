@@ -13,7 +13,9 @@ class simu_daq(VisaEquipment):
         self.channels = settings['channels']
         self.data_manager = data_manager
         self.scan_list = []
-        self.scan_list = asyncio.run(self.setup_channels(self.channels))
+
+    async def initialize(self):
+        self.scan_list = await self.setup_channels(self.channels)
 
     async def setup_channels(self, channels):
         scan_list = []
@@ -52,6 +54,8 @@ class simu_daq(VisaEquipment):
     async def start(self):
         if self.schedule:
             await self.schedule.setup_schedule(self.read_channels)
-    
-    async def perform_task(self):
-        print(f"{self.name} performing its task.")
+
+    async def stop(self):
+        # self.client.write('VSET1:0')
+        print("daq stopped")
+        return True

@@ -6,8 +6,10 @@ class Ka3005PSU(VisaEquipment):
         self.connection = connection
         super().__init__(name, self.connection['mode'], self.connection['address'])  # Initialize the VisaEquipment part of this object
         self.schedule = schedule
-        asyncio.run(self.set_current(current=0.1)) # precaution
-        asyncio.run(self.set_output())
+
+    async def initialize(self):
+        await self.set_current(current=0.1)
+        await self.set_output()
 
     async def set_output(self):
         self.client.write('OVP1')
@@ -38,7 +40,7 @@ class Ka3005PSU(VisaEquipment):
         current = self.client.query('IOUT1?')
         return current
 
-    async def set_stop(self):
+    async def stop(self):
         # self.write('OUT1')
         self.client.write('VSET1:0') ## have to use 0v to stop? bug?
         return True
