@@ -86,7 +86,28 @@ class GUIManager:
         # print("saving....")
         self.saving_data_action()
 
-    ### GUI---Exit button
+    # async def graceful_shutdown(self, eqpt_manager, data_manager):
+    #     try:
+    #         await eqpt_manager.stop_equipment()
+    #         await data_manager.save_data()
+    #     except RuntimeError as e:
+    #         if "Event loop is closed" in str(e):
+    #             print("Event loop already closed, skipping graceful shutdown.")
+    #         else:
+    #             raise e
+    #     finally:
+    #         dpg.stop_dearpygui()
+    # def exit_handler(self):
+    #     app_state.stop()
+    #     loop = asyncio.new_event_loop()
+    #     asyncio.set_event_loop(loop)
+    #     try:
+    #         loop.run_until_complete(self.graceful_shutdown(self.eqpt_manager, self.data_manager))
+    #     finally:
+    #         loop.close()
+    #         dpg.stop_dearpygui()
+
+    ## GUI---Exit button
     def exit_handler(self):
         app_state.stop()
         # asyncio.create_task(self.eqpt_manager.stop_equipment())
