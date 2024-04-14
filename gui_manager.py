@@ -2,6 +2,7 @@ import dearpygui.dearpygui as dpg
 from state import app_state
 from schedule import ConstantIntervalSchedule, CsvSchedule
 import asyncio
+import time
 
 class GUIManager:
     def __init__(self, eqpt_manager, data_manager):
@@ -31,6 +32,43 @@ class GUIManager:
         dpg.setup_dearpygui()
         dpg.show_viewport()
         dpg.set_primary_window("main_window", True)
+
+    ## GUI---realtime plot
+    def update_live_plot(self):
+        # Ensure there's data to plot
+        if not self.data_manager.plot_deque:
+            return
+
+        # Assuming the plot and axes have been created previously, and we're just updating the series
+        channels = {channel for _, _, channel, _ in self.data_manager.plot_deque}
+        for channel in channels:
+            data_x, data_y = zip(*[(dt.timestamp(), data) for dt, _, sid, data in self.data_manager.plot_deque if sid == channel])
+
+            # Check for existing series; update if exists, else create
+            series_tag = f"line_{channel}"
+            if not dpg.does_item_exist(series_tag):
+                # Assuming 'y_axis' is the tag for your Y axis where series should be added
+                dpg.add_line_series(list(data_x), list(data_y), parent="y_axis", label=channel, tag=series_tag)
+            else:
+                dpg.configure_item(series_tag, x=list(data_x), y=list(data_y))
+            dpg.fit_axis_data("y_axis")
+            dpg.fit_axis_data("x_axis")
+
+    async def live_plot_updater(self):
+        while app_state.is_running():
+            self.update_live_plot()
+            dpg.render_dearpygui_frame()
+            await asyncio.sleep(1/30)  # Update at roughly 30 FPS
+
+    async def update_progress_marker(self):
+        start_time = time.time()
+        while app_state.is_running():
+            current_time = time.time() - start_time
+            if dpg.does_item_exist("progress_marker"):
+                dpg.configure_item("progress_marker", x=[current_time])
+            else:
+                print("Progress marker does not exist yet.")
+            await asyncio.sleep(1)
 
     ### GUI---run live plot
     def setup_live_plot(self):
