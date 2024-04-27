@@ -31,6 +31,7 @@ class Equipment(ABC):
     def stop(self):
         pass  # Subclasses must implement this method
 
+    @abstractmethod
     def initialize(self):
         pass
 
@@ -42,17 +43,16 @@ class VisaEquipment(Equipment):
     rm = pyvisa.ResourceManager()
     def __init__(self, name, mode, address):
         super().__init__(name, mode, address)  # Call to superclass constructor to set address
-        self.client = None
+        self.client = self.connect()
 
     def connect(self):
-        print(f"Connecting to VISA equipment at {self.address}")
-        # Example connection using ResourceManager
         self.client = VisaEquipment.rm.open_resource(self.address)
+        print(f"Connecting to VISA equipment at {self.address}")
+        return self.client
 
     def disconnect(self):
+        self.client.close()
         print("Disconnecting VISA equipment")
-        # Assuming there's a close or similar method to disconnect
-        # self.client.close()
 
 class ModbusEquipment(Equipment):
     def connect(self):

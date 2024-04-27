@@ -9,19 +9,20 @@ class Ka3005PSU(VisaEquipment):
 
     async def initialize(self):
         await self.set_current(current=0.1)
-        await self.set_output()
+        await self.set_protection()
+        print("ka3005 ok!")
 
-    async def set_output(self):
+    async def set_protection(self):
         self.client.write('OVP1')
         # time.sleep(0.1)
         self.client.write('OCP1')
         # time.sleep(0.1)
-        self.client.write('OUT1')
         return True
 
     async def set_voltage(self, value=0.5):
         print(f"Setting power supply voltage to {value}V")
-        self.client.write('VSET1:%4.3f' % (value))
+        self.client.write('VSET1:%4.3f' % (value)) 
+        self.client.write('OUT1') ## this model tends to stop output at random
         # return True
 
     async def set_current(self, current=0.1):

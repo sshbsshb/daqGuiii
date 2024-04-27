@@ -13,8 +13,8 @@ class EquipmentManager:
     def load_equipment(self):
         for eq_config in self.config['equipment']:
             # Example for determining which schedule to use based on config
-            if 'sample_rate' in eq_config['schedule']:
-                schedule = ConstantIntervalSchedule(1/eq_config['schedule']['sample_rate'])
+            if 'sample_interval' in eq_config['schedule']:
+                schedule = ConstantIntervalSchedule(eq_config['schedule']['sample_interval'])
             elif 'schedule_csv' in eq_config['schedule']:
                 schedule = CsvSchedule(eq_config['schedule']['schedule_csv'])
             else:

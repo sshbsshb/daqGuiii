@@ -1,14 +1,14 @@
-overall_time_limit: 5 #28800 # 8 hours in second
+overall_time_limit: 28800 # 8 hours in second
 equipment:
 - name: keysight
   class: KeysightDAQ #class file
   type: DAQ
   connection:
     mode: VISA
-    address: GPIB0::23::INSTR
+    address: USB0::0x2A8D::0x5101::MY58032659::0::INSTR
   schedule:
-    sample_rate: 1
-    # schedule_csv: data.csv
+    # sample_interval: 0.1
+    schedule_csv: schedule_daq.csv
   settings:
     channels:
         - channel: "101:105"
@@ -16,54 +16,56 @@ equipment:
           sensor_type: "T"
           remark: "TC T-type temperature"
         - channel: "106:108"
-          measurement: "TEMP:TC"
-          sensor_type: "T"
-          remark: "TC T-type temperature"
-        - channel: "109:115"
-          measurement: "RES"
-          sensor_type: "AUTO"
-          remark: "resistance"
-- name: simu_daq
-  class: simu_daq
-  type: DAQ
-  connection:
-    mode: VISA
-    address: GPIB0::23::INSTR
-  schedule:
-    sample_rate: 2
-    # schedule_csv: data1.csv
-  settings:
-    channels:
-        - channel: "201"
-          measurement: "TEMP:TC"
-          sensor_type: "K"
-          remark: "TC K-type temperature"
-        - channel: "202:203"
-          measurement: "TEMP:TC"
-          sensor_type: "T"
-          remark: "TC T-type temperature"
-        - channel: "204:205"
-          measurement: "RES"
-          sensor_type: "AUTO"
-          remark: "resistance"
-- name: ke
-  class: simu_psu
-  type: PowerSupply
-  connection:
-    mode: Modbus
-    address: 192.168.1.100
-    port: 502
-  schedule:
-    schedule_csv: data.csv
-  settings:
-    max_current: 5
-    max_voltage: 30
-# - name: ka3005
-#   class: Ka3005PSU
-#   type: PowerSupply
+          measurement: "VOLT:DC"
+          sensor_type: "10"
+          remark: "Sensors"
+        - channel: "201:203, 208:210"
+          measurement: "FRES" #RES for 2-wire
+          sensor_type: "100" #AUTO
+          remark: "4-wire resistance"
+# - name: simu_daq
+#   class: simu_daq
+#   type: DAQ
 #   connection:
 #     mode: VISA
-#     address: ASRL3::INSTR
+#     address: GPIB0::23::INSTR
+#   schedule:
+#     sample_rate: 2
+#     # schedule_csv: data1.csv
+#   settings:
+#     channels:
+#         - channel: "201"
+#           measurement: "TEMP:TC"
+#           sensor_type: "K"
+#           remark: "TC K-type temperature"
+#         - channel: "202:203"
+#           measurement: "TEMP:TC"
+#           sensor_type: "T"
+#           remark: "TC T-type temperature"
+#         - channel: "204:205"
+#           measurement: "RES"
+#           sensor_type: "AUTO"
+#           remark: "resistance"
+# - name: ke
+#   class: simu_psu
+#   type: PowerSupply
+#   connection:
+#     mode: Modbus
+#     address: 192.168.1.100
+#     port: 502
 #   schedule:
 #     schedule_csv: data.csv
 #   settings:
+#     max_current: 5
+#     max_voltage: 30
+- name: korad_ka3005
+  class: Ka3005PSU
+  type: PowerSupply
+  connection:
+    mode: VISA
+    address: ASRL3::INSTR
+  schedule:
+    schedule_csv: schedule_pump.csv
+  settings:
+    max_current: 5
+    max_voltage: 30

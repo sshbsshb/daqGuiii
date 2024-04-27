@@ -33,9 +33,15 @@ class CsvSchedule(Schedule):
         return schedule_data
 
     async def setup_schedule(self, task, *args, **kwargs):
+        start_time = asyncio.get_event_loop().time()
         last_time = 0
         for time, value in self.schedule_data:
             if app_state.is_running():
-                await asyncio.sleep(time-last_time)
-                last_time = time
+                elapsed_time = asyncio.get_event_loop().time() - start_time
+                sleep_time = max(0, time - last_time - elapsed_time)
+                await asyncio.sleep(sleep_time)
+                start_time = asyncio.get_event_loop().time()
                 await task(value=value)
+                last_time = time
+                # end_task_time = asyncio.get_event_loop().time()
+                # start_time += time + (end_task_time - start_task_time)
