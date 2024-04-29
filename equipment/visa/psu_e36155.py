@@ -23,20 +23,23 @@ class psu_e36155(VisaEquipment):
         self.client.write('OUTP ON')
         return True
 
-    async def set_voltage(self, value=0.5):
-        print(f"Setting power supply voltage to {value}V")
+    async def set_power(self, value=0.5):
         resistance = 13
         current = 1.5 * 6 * value / resistance # 150% of the 6 units' max current
-        self.client.write('APPL %4.3f, %4.3f' % (value, current)) 
+        self.client.write('APPL %4.3f, %4.3f' % (value, current))
+        print(f"Setting power supply voltage to {value}V, current to {current}A")
         # self.client.write('OUTP ON')
-        # return True
+        # return True       
+
+    async def set_voltage(self, value=0.5):
+        pass
 
     async def set_current(self, current=0.1):
         pass
 
     async def start(self):
         if self.schedule:
-            await self.schedule.setup_schedule(self.set_voltage)
+            await self.schedule.setup_schedule(self.set_power)
 
     async def get_voltage(self):
         voltage = self.client.query('MEAS:VOLT?')
