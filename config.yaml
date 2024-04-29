@@ -1,7 +1,7 @@
 overall_time_limit: 28800 # 8 hours in second
 equipment:
 - name: keysight
-  class: KeysightDAQ #class file
+  class: daq_keysight #class file
   type: DAQ
   connection:
     mode: VISA
@@ -23,8 +23,8 @@ equipment:
           measurement: "FRES" #RES for 2-wire
           sensor_type: "100" #AUTO
           remark: "4-wire resistance"
-# - name: simu_daq
-#   class: simu_daq
+# - name: simulation daq
+#   class: daq_simu
 #   type: DAQ
 #   connection:
 #     mode: VISA
@@ -46,8 +46,8 @@ equipment:
 #           measurement: "RES"
 #           sensor_type: "AUTO"
 #           remark: "resistance"
-# - name: ke
-#   class: simu_psu
+# - name: simulation psu
+#   class: psu_simu
 #   type: PowerSupply
 #   connection:
 #     mode: Modbus
@@ -59,7 +59,7 @@ equipment:
 #     max_current: 5
 #     max_voltage: 30
 - name: korad_ka3005
-  class: Ka3005PSU
+  class: PSU_Ka3005
   type: PowerSupply
   connection:
     mode: VISA

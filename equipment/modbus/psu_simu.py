@@ -2,7 +2,7 @@
 from ..equipment import VisaEquipment
 import asyncio
 
-class simu_psu(VisaEquipment):
+class psu_simu(VisaEquipment):
     def __init__(self, name, connection, settings=None, schedule=None, *args, **kwargs):
         self.connection = connection
         super().__init__(name, self.connection['mode'], self.connection['address'])  # Initialize the VisaEquipment part of this object

@@ -5,7 +5,7 @@ from pandas import Timestamp
 # import time
 
 
-class KeysightDAQ(VisaEquipment):
+class daq_keysight(VisaEquipment):
     def __init__(self, name, connection, settings=None, schedule=None, data_manager=None):
         self.connection = connection
         super().__init__(name, self.connection['mode'], self.connection['address'])  # Initialize the VisaEquipment part of this object
