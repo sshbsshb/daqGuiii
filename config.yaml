@@ -1,13 +1,13 @@
 overall_time_limit: 28800 # 8 hours in second
 equipment:
-- name: keysight
+- name: keysight_970A_daq
   class: daq_keysight #class file
   type: DAQ
   connection:
     mode: VISA
     address: USB0::0x2A8D::0x5101::MY58032659::0::INSTR
   schedule:
-    # sample_interval: 0.1
+    # sample_interval: 0.4
     schedule_csv: schedule_daq.csv
   settings:
     channels:
@@ -58,14 +58,25 @@ equipment:
 #   settings:
 #     max_current: 5
 #     max_voltage: 30
-- name: korad_ka3005
-  class: PSU_Ka3005
+- name: korad_ka3005_pump
+  class: psu_ka3005
   type: PowerSupply
   connection:
     mode: VISA
     address: ASRL3::INSTR
   schedule:
     schedule_csv: schedule_pump.csv
+  settings:
+    max_current: 5
+    max_voltage: 30
+- name: keysight_e36155_heater
+  class: psu_e36155
+  type: PowerSupply
+  connection:
+    mode: VISA
+    address: USB0::0x2A8D::0x5902::MY63000128::0::INSTR
+  schedule:
+    schedule_csv: schedule_heater.csv
   settings:
     max_current: 5
     max_voltage: 30

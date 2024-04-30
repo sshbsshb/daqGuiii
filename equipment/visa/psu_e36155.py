@@ -19,6 +19,7 @@ class psu_e36155(VisaEquipment):
         self.client.write('VOLT:PROT MAX')
         # time.sleep(0.1)
         self.client.write('CURR:PROT:STAT ON')
+        self.client.write('CURR:RANG HIGH')
         # time.sleep(0.1)
         self.client.write('OUTP ON')
         return True
