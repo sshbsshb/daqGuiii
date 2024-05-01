@@ -43,5 +43,3 @@ class CsvSchedule(Schedule):
                 start_time = asyncio.get_event_loop().time()
                 await task(value=value)
                 last_time = time
-                # end_task_time = asyncio.get_event_loop().time()
-                # start_time += time + (end_task_time - start_task_time)

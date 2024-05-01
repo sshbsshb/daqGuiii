@@ -17,10 +17,8 @@ class psu_e36155(VisaEquipment):
 
     async def set_protection(self):
         self.client.write('VOLT:PROT MAX')
-        # time.sleep(0.1)
         self.client.write('CURR:PROT:STAT ON')
         self.client.write('CURR:RANG HIGH')
-        # time.sleep(0.1)
         self.client.write('OUTP ON')
         return True
 
@@ -29,8 +27,6 @@ class psu_e36155(VisaEquipment):
         current = 1.5 * 6 * value / resistance # 150% of the 6 units' max current
         self.client.write('APPL %4.3f, %4.3f' % (value, current))
         print(f"Setting power supply voltage to {value}V, current to {current}A")
-        # self.client.write('OUTP ON')
-        # return True       
 
     async def set_voltage(self, value=0.5):
         pass
@@ -51,6 +47,5 @@ class psu_e36155(VisaEquipment):
         return current
 
     async def stop(self):
-        # self.write('OUT1')
-        self.client.write('OUTP OFF') ## have to use 0v to stop? bug?
+        self.client.write('OUTP OFF')
         return True
