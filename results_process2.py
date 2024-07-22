@@ -4,7 +4,7 @@ import json
 from scipy import stats
 
 # Read the CSV file
-df = pd.read_csv('data\data_2024-07-17_14-44-16.csv')
+df = pd.read_csv('data\data_2024-07-17_15-53-20_1.5L.csv')
 
 # Convert Timestamp to datetime
 df['Timestamp'] = pd.to_datetime(df['Timestamp'])

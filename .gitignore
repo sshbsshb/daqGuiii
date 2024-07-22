@@ -12,3 +12,5 @@ __pycache__
 data
 test_serial.ipyn
 try
+*.csv
+*.png
