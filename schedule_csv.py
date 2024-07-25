@@ -97,7 +97,7 @@ def plot_schedules(pump_schedule, heater_schedule, daq_schedule):
     plt.close()
 
 # Define parameters
-pump_speeds = [3.17, 2.54, 1.76, 1.15, 0.57]
+pump_speeds = [3.24, 2.59, 1.83, 1.18, 0.59]
 heater_voltages = [0, 2, 4, 6, 8, 10, 12, 14, 16]
 daq_value = 60
 stabilization_time = 400  # Can be changed as needed
@@ -108,9 +108,9 @@ heater_schedule, daq_schedule = create_heater_schedule(heater_voltages, pump_spe
 daq_schedule = create_daq_schedule(daq_value, daq_schedule)
 
 # Write schedules to CSV files
-write_csv('schedule_pump1.csv', pump_schedule)
-write_csv('schedule_heater1.csv', heater_schedule)
-write_csv('schedule_daq1.csv', daq_schedule)
+write_csv('schedule_pump.csv', pump_schedule)
+write_csv('schedule_heater.csv', heater_schedule)
+write_csv('schedule_daq.csv', daq_schedule)
 
 # Plot schedules
 plot_schedules(pump_schedule, heater_schedule, daq_schedule)

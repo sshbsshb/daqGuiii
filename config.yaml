@@ -1,4 +1,4 @@
-overall_time_limit: 28800 # 8 hours in second
+overall_time_limit: 86400 # 24 hours in second
 equipment:
 - name: keysight_970A_daq
   class: daq_keysight #class file
