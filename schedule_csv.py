@@ -53,7 +53,8 @@ def create_heater_schedule(voltages, pump_speeds, stabilization_time):
             current_time += 600  # Heater runs for 600s
             daq_schedule.append(current_time)
             current_time += 100  # Time for DAQ recording
-
+            
+    schedule.append((current_time, 0))  # shutdown heater !!!!
     return schedule, daq_schedule
 
 def create_daq_schedule(daq_value, heater_schedule):
