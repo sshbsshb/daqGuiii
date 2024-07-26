@@ -34,7 +34,7 @@ def create_pump_schedule(speeds, stabilization_time):
             current_time += heater_cycle_time
 
     # Add final entries
-    schedule.append((current_time, 1))
+    schedule.append((current_time+heater_cycle_time, 1))
     # schedule.append((current_time + 10, 1))
     return schedule
 
