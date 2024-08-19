@@ -9,8 +9,8 @@
 /testcsvplot2.py
 tt.py
 __pycache__
-data
 test_serial.ipyn
 try
 *.csv
 *.png
+*.7z
