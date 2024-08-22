@@ -1,11 +1,13 @@
 from ..equipment import VisaEquipment
 import asyncio
+from pandas import Timestamp
 
 class psu_e36155(VisaEquipment):
-    def __init__(self, name, connection, settings=None, schedule=None, *args, **kwargs):
+    def __init__(self, name, connection, settings=None, schedule=None, data_manager=None, *args, **kwargs):
         self.connection = connection
         super().__init__(name, self.connection['mode'], self.connection['address'])  # Initialize the VisaEquipment part of this object
         self.schedule = schedule
+        self.data_manager = data_manager  # Store the AsyncDataManager instance
 
     async def initialize(self):
         await self.set_sense()
@@ -28,6 +30,14 @@ class psu_e36155(VisaEquipment):
         self.client.write('APPL %4.3f, %4.3f' % (value, current))
         print(f"Setting power supply voltage to {value}V, current to {current}A")
 
+        await asyncio.sleep(10) ## wait 10 sec for the equipment to set power and steady
+        power = self.client.query('MEAS:POW?') #MEAS:SCAL:POW:DC?
+        print(f"power supply power is {power}W")
+        if self.data_manager:
+                timestamp = Timestamp.now()
+                await self.data_manager.add_data(self, timestamp, self.name, f"Power", power)
+        return True
+
     async def set_voltage(self, value=0.5):
         pass
 
@@ -45,6 +55,10 @@ class psu_e36155(VisaEquipment):
     async def get_current(self):
         current = self.client.query('MEAS:CURR?')
         return current
+    
+    async def get_current(self):
+        power = self.client.query('MEAS:POW?') #MEAS:SCAL:POW:DC?
+        return power
 
     async def stop(self):
         self.client.write('OUTP OFF')
