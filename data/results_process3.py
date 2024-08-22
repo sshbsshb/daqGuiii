@@ -14,11 +14,10 @@ def extract_config(filename):
     else:
         print(f"Warning: Could not extract configuration from filename: {filename}")
         return 'unknown'
-    
+
 def process_csv_file(file_path, calibration_coeffs):
     # Extract configuration from filename
     file_name = os.path.basename(file_path)
-    # config = file_name.split('_')[-1].split('.')[0]
     config = extract_config(file_name)
 
     # Read the CSV file
@@ -35,46 +34,48 @@ def process_csv_file(file_path, calibration_coeffs):
 
     # Calculate statistics for each channel in each steady state
     channels = df['Channel'].unique()
-    results = {channel: {'mean': [], 'std': []} for channel in channels}
+    results = {channel: {'raw_data': []} for channel in channels}
 
     for state in steady_states:
         state_data = pd.concat(state)
         for channel in channels:
             channel_data = state_data[state_data['Channel'] == channel]['Data']
             if not channel_data.empty:
-                mean_value = channel_data.mean()
-                std_value = channel_data.std()
-                results[channel]['mean'].append(mean_value)
-                results[channel]['std'].append(std_value)
+                results[channel]['raw_data'].append(channel_data.tolist())
 
-    # Apply calibration and create final results
+    # Apply calibration and calculate statistics
     calibrated_results = {channel: {'mean': [], 'std': []} for channel in channels}
 
     for channel, values in results.items():
         if channel in calibration_coeffs:
             m = calibration_coeffs[channel]['m']
             b = calibration_coeffs[channel]['b']
-            calibrated_means = [m * value + b for value in values['mean']]
-            calibrated_stds = [m * value for value in values['std']]  # Standard deviation is scaled by m
-            calibrated_results[channel]['mean'] = calibrated_means
-            calibrated_results[channel]['std'] = calibrated_stds
+            for raw_data in values['raw_data']:
+                calibrated_data = [m * value + b for value in raw_data]
+                calibrated_results[channel]['mean'].append(np.mean(calibrated_data))
+                calibrated_results[channel]['std'].append(np.std(calibrated_data))
         else:
             print(f"Warning: No calibration coefficient found for {channel}. Using raw values.")
-            calibrated_results[channel] = values
+            for raw_data in values['raw_data']:
+                calibrated_results[channel]['mean'].append(np.mean(raw_data))
+                calibrated_results[channel]['std'].append(np.std(raw_data))
 
     # Create result DataFrame
     result_df = pd.DataFrame({f"{channel}_mean": values['mean'] for channel, values in calibrated_results.items()})
     result_df = result_df.join(pd.DataFrame({f"{channel}_std": values['std'] for channel, values in calibrated_results.items()}))
 
-    # Calculate overall statistics
-    overall_stats = {}
-    for channel, values in calibrated_results.items():
-        means = np.array(values['mean'])
-        overall_mean = np.mean(means)
-        overall_std = np.std(means)
-        overall_stats[channel] = {'mean': overall_mean, 'std': overall_std}
+    # Add flow rate information
+    flow_rates = [2.5, 2.0, 1.5, 1.0, 0.88]
+    result_df['Nominal_Flow_Rate'] = np.repeat(flow_rates, 9)  # 9 power levels for each flow rate
 
-    return result_df, overall_stats, config
+    # Add power level information
+    power_levels = list(range(0, 18, 2))  # [0, 2, 4, 6, 8, 10, 12, 14, 16]
+    result_df['Power'] = power_levels * 5  # 5 flow rates
+
+    # Add actual flow rate (assuming it's in Channel_108_mean)
+    result_df['Actual_Flow_Rate'] = result_df['Channel_108_mean']
+
+    return result_df, config
 
 def identify_steady_states(grouped, time_threshold=3):
     steady_states = []
@@ -121,7 +122,7 @@ for filename in os.listdir(file_folder):
         file_path = os.path.join(file_folder, filename)
         print(f"Processing {filename}...")
 
-        result_df, overall_stats, config = process_csv_file(file_path, calibration_coeffs)
+        result_df, config = process_csv_file(file_path, calibration_coeffs)
 
         # Save results to CSV files
         save_name = f'calibrated_{config}.csv'
