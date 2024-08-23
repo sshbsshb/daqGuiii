@@ -3,7 +3,7 @@ import asyncio
 from pandas import Timestamp
 
 class psu_e36155(VisaEquipment):
-    def __init__(self, name, connection, settings=None, schedule=None, data_manager=None, *args, **kwargs):
+    def __init__(self, name, connection, settings=None, schedule=None, data_manager=None):
         self.connection = connection
         super().__init__(name, self.connection['mode'], self.connection['address'])  # Initialize the VisaEquipment part of this object
         self.schedule = schedule
@@ -31,9 +31,11 @@ class psu_e36155(VisaEquipment):
         print(f"Setting power supply voltage to {value}V, current to {current}A")
 
         await asyncio.sleep(10) ## wait 10 sec for the equipment to set power and steady
-        power = self.client.query('MEAS:POW?') #MEAS:SCAL:POW:DC?
+        power_raw = self.client.query('MEAS:POW?') #MEAS:SCAL:POW:DC?
+        power = float(power_raw)
         print(f"power supply power is {power}W")
         if self.data_manager:
+                print("power datad")
                 timestamp = Timestamp.now()
                 await self.data_manager.add_data(self, timestamp, self.name, f"Power", power)
         return True
