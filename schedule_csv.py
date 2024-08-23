@@ -1,7 +1,7 @@
 import csv
 import matplotlib.pyplot as plt
 
-def create_pump_schedule(speeds, stabilization_time):
+def create_pump_schedule(speeds, stabilization_time, heater_stable_time, record_time):
     schedule = []
     current_time = 0
     for i, speed in enumerate(speeds):
@@ -30,7 +30,7 @@ def create_pump_schedule(speeds, stabilization_time):
 
         # Hold speed for heater cycle and DAQ recording
         if i < len(speeds) - 1:
-            heater_cycle_time = len(heater_voltages) * 700  # (600s + 100s) * number of voltages
+            heater_cycle_time = len(heater_voltages) * ( heater_stable_time + record_time)  # (600s + 100s) * number of voltages
             current_time += heater_cycle_time
 
     # Add final entries
@@ -38,7 +38,7 @@ def create_pump_schedule(speeds, stabilization_time):
     # schedule.append((current_time + 10, 1))
     return schedule
 
-def create_heater_schedule(voltages, pump_speeds, stabilization_time):
+def create_heater_schedule(voltages, pump_speeds, stabilization_time, heater_stable_time, record_time):
     schedule = []
     daq_schedule = []
     current_time = 10  # Start after initial pump ramp
@@ -50,9 +50,9 @@ def create_heater_schedule(voltages, pump_speeds, stabilization_time):
             if now_speed !=speed:
                 now_speed = speed
                 current_time += stabilization_time + 7  # Add time for stabilization and ramp
-            current_time += 600  # Heater runs for 600s
+            current_time += heater_stable_time  # Heater runs for 600s
             daq_schedule.append(current_time)
-            current_time += 100  # Time for DAQ recording
+            current_time += record_time  # Time for DAQ recording
             
     schedule.append((current_time, 0))  # shutdown heater !!!!
     return schedule, daq_schedule
@@ -101,11 +101,13 @@ def plot_schedules(pump_schedule, heater_schedule, daq_schedule):
 pump_speeds = [3.24, 2.59, 1.83, 1.18, 0.59]
 heater_voltages = [0, 2, 4, 6, 8, 10, 12, 14, 16]
 daq_value = 60
-stabilization_time = 400  # Can be changed as needed
+stabilization_time = 300  # Can be changed as needed
+heater_stable_time = 300
+record_time = 100
 
 # Create schedules
-pump_schedule = create_pump_schedule(pump_speeds, stabilization_time)
-heater_schedule, daq_schedule = create_heater_schedule(heater_voltages, pump_speeds, stabilization_time)
+pump_schedule = create_pump_schedule(pump_speeds, stabilization_time, heater_stable_time, record_time)
+heater_schedule, daq_schedule = create_heater_schedule(heater_voltages, pump_speeds, stabilization_time, heater_stable_time, record_time)
 daq_schedule = create_daq_schedule(daq_value, daq_schedule)
 
 # Write schedules to CSV files
