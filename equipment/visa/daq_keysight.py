@@ -34,6 +34,8 @@ class daq_keysight(VisaEquipment):
             # self.client.write(':CONF:%s,%s,(@%s)' % (item['measurement'], item['sensor_type'], item['channel'])) # please check command expert!
             print(':CONF:%s %s,(@%s)' % (item['measurement'], item['sensor_type'], item['channel']))
             self.client.write(':CONF:%s %s,(@%s)' % (item['measurement'], item['sensor_type'], item['channel']))
+            if item['measurement'] == "FRES":
+                self.client.write('FRES:OCOM ON')
             scan_list.append(item['channel'])
             # await asyncio.sleep(0.1)
 
