@@ -78,7 +78,8 @@ def plot_temp_vs_flow_power(df, config, channel):
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.gca().invert_xaxis()
     plt.tight_layout()
-    plt.savefig(f'{channel}_vs_flow_power_config_{config}_with_error.png', bbox_inches='tight')
+    save_path = os.path.join(FILE_GROUP, f'{channel}_vs_flow_power_config_{config}_with_error.png')
+    plt.savefig(save_path, bbox_inches='tight')
     plt.close()
 
 def plot_highest_power_temps(result_df):
@@ -105,7 +106,8 @@ def plot_highest_power_temps(result_df):
         plt.grid(True, linestyle='--', alpha=0.7)
         plt.gca().invert_xaxis()
         plt.tight_layout()
-        plt.savefig(f'temperatures_vs_actual_flow_rate_16W_config_{config}.png')
+        save_path = os.path.join(FILE_GROUP, f'temperatures_vs_actual_flow_rate_16W_config_{config}.png')
+        plt.savefig(save_path)
         plt.close()
 
 def plot_channel_203_all_configs(result_df):
@@ -130,7 +132,8 @@ def plot_channel_203_all_configs(result_df):
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.gca().invert_xaxis()
     plt.tight_layout()
-    plt.savefig('channel203_all_configs_16W.png')
+    save_path = os.path.join(FILE_GROUP, 'channel203_all_configs_16W.png')
+    plt.savefig(save_path)
     plt.close()
 
 def main():
