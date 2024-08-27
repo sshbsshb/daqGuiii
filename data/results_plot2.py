@@ -10,6 +10,7 @@ from itertools import cycle
 DATA_FOLDER = 'data'
 SAVE_FOLDER = 'processed'
 FILE_GROUP = 'uniform'
+FIG_FILE = 'figure'
 BASE_SAVE_PATH = os.path.join(DATA_FOLDER, SAVE_FOLDER, FILE_GROUP)
 HEATER_CHANNELS = ['Channel_201_mean', 'Channel_202_mean', 'Channel_203_mean', 
                    'Channel_208_mean', 'Channel_209_mean', 'Channel_210_mean']
@@ -78,7 +79,7 @@ def plot_temp_vs_flow_power(df, config, channel):
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.gca().invert_xaxis()
     plt.tight_layout()
-    save_path = os.path.join(FILE_GROUP, f'{channel}_vs_flow_power_config_{config}_with_error.png')
+    save_path = os.path.join(FIG_FILE, f'{channel}_vs_flow_power_config_{config}_with_error.png')
     plt.savefig(save_path, bbox_inches='tight')
     plt.close()
 
@@ -106,7 +107,7 @@ def plot_highest_power_temps(result_df):
         plt.grid(True, linestyle='--', alpha=0.7)
         plt.gca().invert_xaxis()
         plt.tight_layout()
-        save_path = os.path.join(FILE_GROUP, f'temperatures_vs_actual_flow_rate_16W_config_{config}.png')
+        save_path = os.path.join(FIG_FILE, f'temperatures_vs_actual_flow_rate_16W_config_{config}.png')
         plt.savefig(save_path)
         plt.close()
 
@@ -132,7 +133,7 @@ def plot_channel_203_all_configs(result_df):
     plt.grid(True, linestyle='--', alpha=0.7)
     plt.gca().invert_xaxis()
     plt.tight_layout()
-    save_path = os.path.join(FILE_GROUP, 'channel203_all_configs_16W.png')
+    save_path = os.path.join(FIG_FILE, 'channel203_all_configs_16W.png')
     plt.savefig(save_path)
     plt.close()
 
@@ -147,7 +148,8 @@ def main():
     result_df = result_df.sort_values(['Configuration', 'Flow_Rate'], ascending=[True, False])
 
     print(result_df)
-    result_df.to_csv('highest_power_temperatures.csv', index=False)
+    save_path = os.path.join(FIG_FILE, 'highest_power_temperatures.csv')
+    result_df.to_csv(save_path, index=False)
     print("Results saved to 'highest_power_temperatures.csv'")
 
     # Load full dataset
