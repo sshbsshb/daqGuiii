@@ -65,7 +65,7 @@ def process_csv_file(file_path, calibration_coeffs):
     result_df = result_df.join(pd.DataFrame({f"{channel}_std": values['std'] for channel, values in calibrated_results.items()}))
 
     # Add flow rate information
-    flow_rates = [2.5, 2.0, 1.5, 1.0, 0.88]
+    flow_rates = [2.5, 2.0, 1.5, 1.0, 0.5]
     result_df['Nominal_Flow_Rate'] = np.repeat(flow_rates, 9)  # 9 power levels for each flow rate
 
     # Add power level information

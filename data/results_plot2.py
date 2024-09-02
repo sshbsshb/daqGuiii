@@ -18,8 +18,8 @@ COLORS = plt.cm.tab20(np.linspace(0, 1, 20))
 MARKERS = ['o', 's', 'D', '^', 'v', '<', '>', 'p', '*', 'h', 'H', '+', 'x', 'd', '|', '_']
 
 def assign_flow_group(flow):
-    if 0.4 <= flow < 0.95:
-        return 0.88
+    if 0.4 <= flow < 0.7:
+        return 0.5
     elif 0.95 <= flow < 1.3:
         return 1.0
     elif 1.3 <= flow < 1.8:
@@ -71,7 +71,7 @@ def plot_temp_vs_flow_power(df, config, channel):
         plt.errorbar(x, y, yerr=yerr, 
                      marker=marker, linestyle='-', linewidth=2, markersize=8,
                      label=f'{power}W', color=color, capsize=5, capthick=2, elinewidth=1)
-
+    plt.ylim(40, 70)
     plt.xlabel('Actual Flow Rate (L/min)', fontsize=12)
     plt.ylabel('Temperature (°C)', fontsize=12)
     plt.title(f'{channel} Temperature vs Flow Rate for Configuration {config}', fontsize=14)
@@ -99,7 +99,7 @@ def plot_highest_power_temps(result_df):
                 plt.plot(config_data['Actual_Flow_Rate'], config_data[channel], 
                          color=COLORS[i], marker=MARKERS[i], linestyle='-', linewidth=2, markersize=8,
                          label=channel)
-
+        plt.ylim(40, 70)
         plt.xlabel('Actual Flow Rate (L/min)', fontsize=12)
         plt.ylabel('Temperature (°C)', fontsize=12)
         plt.title(f'Heater Temperatures vs Actual Flow Rate for Configuration {config} (at 16W)', fontsize=14)
@@ -125,7 +125,7 @@ def plot_channel_203_all_configs(result_df):
             plt.plot(config_data['Actual_Flow_Rate'], config_data['Channel_203_mean'], 
                      color=COLORS[i], marker=MARKERS[i], linestyle='-', linewidth=2, markersize=8,
                      label=f'Config {config}')
-
+    plt.ylim(40, 70)
     plt.xlabel('Actual Flow Rate (L/min)', fontsize=12)
     plt.ylabel('Temperature (°C)', fontsize=12)
     plt.title('Channel 203 Temperature vs Actual Flow Rate for All Configurations (at 16W)', fontsize=14)
@@ -134,6 +134,32 @@ def plot_channel_203_all_configs(result_df):
     plt.gca().invert_xaxis()
     plt.tight_layout()
     save_path = os.path.join(FIG_FILE, 'channel203_all_configs_16W.png')
+    plt.savefig(save_path)
+    plt.close()
+
+def plot_channel_all_configs(result_df, channel_name='202'):
+    plt.figure(figsize=(15, 10))
+
+    for i, config in enumerate(result_df['Configuration'].unique()):
+        config_data = result_df[result_df['Configuration'] == config]
+        if f'Channel_{channel_name}_std' in config_data.columns:
+            plt.errorbar(config_data['Actual_Flow_Rate'], config_data[f'Channel_{channel_name}_mean'], 
+                         yerr=config_data[f'Channel_{channel_name}_std'],
+                         color=COLORS[i], marker=MARKERS[i], linestyle='-', linewidth=2, markersize=8,
+                         label=f'Config {config}', capsize=5, capthick=2, elinewidth=1)
+        else:
+            plt.plot(config_data['Actual_Flow_Rate'], config_data[f'Channel_{channel_name}_mean'], 
+                     color=COLORS[i], marker=MARKERS[i], linestyle='-', linewidth=2, markersize=8,
+                     label=f'Config {config}')
+    plt.ylim(40, 70)
+    plt.xlabel('Actual Flow Rate (L/min)', fontsize=12)
+    plt.ylabel('Temperature (°C)', fontsize=12)
+    plt.title(f'Channel_{channel_name} Temperature vs Actual Flow Rate for All Configurations (at 16W)', fontsize=14)
+    plt.legend(fontsize=10)
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.gca().invert_xaxis()
+    plt.tight_layout()
+    save_path = os.path.join(FIG_FILE, f'Channel_{channel_name}_all_configs_16W.png')
     plt.savefig(save_path)
     plt.close()
 
@@ -166,7 +192,8 @@ def main():
             plot_temp_vs_flow_power(full_data, config, channel)
 
     plot_highest_power_temps(result_df)
-    plot_channel_203_all_configs(result_df)
+    # plot_channel_203_all_configs(result_df)
+    plot_channel_all_configs(result_df, channel_name='210')
 
     print("All plots have been updated with error bars and saved as PNG files in the current directory.")
 
