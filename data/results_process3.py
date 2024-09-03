@@ -110,7 +110,7 @@ with open('data/calibration_coefficients.json', 'r') as f:
 
 # Specify the folder containing CSV files
 data_folder = 'data'
-file_group = 'uniform'
+file_group = '1.5-2mm'
 file_folder = os.path.join(data_folder, file_group)
 save_folder = 'processed'
 base_save_path = os.path.join(data_folder, save_folder, file_group)

@@ -9,7 +9,7 @@ from itertools import cycle
 # Constants and configurations
 DATA_FOLDER = 'data'
 SAVE_FOLDER = 'processed'
-FILE_GROUP = 'uniform'
+FILE_GROUP = '1.5-2mm'
 FIG_FILE = 'figure'
 BASE_SAVE_PATH = os.path.join(DATA_FOLDER, SAVE_FOLDER, FILE_GROUP)
 HEATER_CHANNELS = ['Channel_201_mean', 'Channel_202_mean', 'Channel_203_mean', 
