@@ -34,11 +34,11 @@ class psu_e36155(VisaEquipment):
         power_raw = self.client.query('MEAS:POW?') #MEAS:SCAL:POW:DC?
         power = float(power_raw)
         print(f"power supply power is {power}W")
-        if self.data_manager:
-                print("power datad")
-                timestamp = Timestamp.now()
-                await self.data_manager.add_data(self, timestamp, self.name, f"Power", power)
-        return True
+        # if self.data_manager:
+        #         print("power datad")
+        #         timestamp = Timestamp.now()
+        #         await self.data_manager.add_data(self, timestamp, self.name, f"Power", power)
+        # return True
 
     async def set_voltage(self, value=0.5):
         pass
