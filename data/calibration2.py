@@ -5,23 +5,31 @@ import numpy as np
 from scipy import stats
 import matplotlib.pyplot as plt
 
-## calibration process file, if each point is in a separated file.
+## calibration process file, if all the points are in a file.
 
 def process_calibration_file(file_path):
-    reference_value = float(file_path.split('_')[-1].split('.')[0])
     df = pd.read_csv(file_path)
-    channels = ['Channel_101', 'Channel_102', 'Channel_103'] + [f'Channel_{i}' for i in range(201, 211)]
-    calibration_data = {}
+    df['Timestamp'] = pd.to_datetime(df['Timestamp'])
+    
+    channels = ['Channel_101', 'Channel_102', 'Channel_103', 'Channel_104'] + [f'Channel_{i}' for i in range(201, 211)]
+    calibration_data = {channel: {} for channel in channels}
+    
+    reference_points = [20, 30, 40, 50, 60, 70, 80, 90]
+    
     for channel in channels:
-        channel_data = df[df['Channel'] == channel]['Data']
-        if not channel_data.empty:
-            channel_mean = channel_data.mean()
-            calibration_data[channel] = (channel_mean, reference_value)
+        channel_data = df[df['Channel'] == channel]
+        for ref_point in reference_points:
+            # Assuming the reference points are in ascending order
+            stage_data = channel_data.iloc[len(channel_data) // len(reference_points) * reference_points.index(ref_point):
+                                           len(channel_data) // len(reference_points) * (reference_points.index(ref_point) + 1)]
+            measured_mean = stage_data['Data'].mean()
+            calibration_data[channel][ref_point] = measured_mean
+    
     return calibration_data
 
 def plot_calibration(channel, data_points, slope, intercept, r_squared):
-    x = [point[0] for point in data_points]  # Measured values
-    y = [point[1] for point in data_points]  # Reference values
+    x = list(data_points.values())  # Measured values
+    y = list(data_points.keys())    # Reference values
 
     plt.figure(figsize=(10, 6))
     plt.scatter(x, y, color='blue', label='Calibration Points')
@@ -46,27 +54,19 @@ def plot_calibration(channel, data_points, slope, intercept, r_squared):
     plt.savefig(f'calibration_plot_{channel}.png')
     plt.close()
 
-# Directory containing calibration files
+# Directory containing calibration file
 cal_directory = "data/cal"
+cal_file = "data_2024-09-09_17-44-54_cal2.csv"  # Update this with your actual filename
+file_path = os.path.join(cal_directory, cal_file)
 
-all_calibration_data = {}
-
-# Traverse all files in the calibration directory
-for filename in os.listdir(cal_directory):
-    if filename.endswith(".csv"):
-        file_path = os.path.join(cal_directory, filename)
-        calibration_data = process_calibration_file(file_path)
-        
-        for channel, data in calibration_data.items():
-            if channel not in all_calibration_data:
-                all_calibration_data[channel] = []
-            all_calibration_data[channel].append(data)
+# Process the calibration file
+all_calibration_data = process_calibration_file(file_path)
 
 # Calculate final calibration coefficients (mx + b) and plot
 final_coefficients = {}
 for channel, data_points in all_calibration_data.items():
-    x = [point[0] for point in data_points]  # Measured values
-    y = [point[1] for point in data_points]  # Reference values
+    x = list(data_points.values())  # Measured values
+    y = list(data_points.keys())    # Reference values
     
     # Perform linear regression
     slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
