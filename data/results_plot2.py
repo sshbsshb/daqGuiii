@@ -193,7 +193,8 @@ def main():
 
     plot_highest_power_temps(result_df)
     # plot_channel_203_all_configs(result_df)
-    plot_channel_all_configs(result_df, channel_name='210')
+    for name in [201, 202, 203, 208, 209, 210]:
+        plot_channel_all_configs(result_df, channel_name=f'{name}')
 
     print("All plots have been updated with error bars and saved as PNG files in the current directory.")
 
