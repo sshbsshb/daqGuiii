@@ -9,7 +9,7 @@ from itertools import cycle
 # Constants and configurations
 DATA_FOLDER = 'data'
 SAVE_FOLDER = 'processed'
-FILE_GROUP = '1.5-2mm'
+FILE_GROUP = 'uniform'
 FIG_FILE = 'figure'
 BASE_SAVE_PATH = os.path.join(DATA_FOLDER, SAVE_FOLDER, FILE_GROUP)
 HEATER_CHANNELS = ['Channel_201_mean', 'Channel_202_mean', 'Channel_203_mean', 
@@ -193,7 +193,8 @@ def main():
 
     plot_highest_power_temps(result_df)
     # plot_channel_203_all_configs(result_df)
-    plot_channel_all_configs(result_df, channel_name='210')
+    for name in [201, 202, 203, 208, 209, 210]:
+        plot_channel_all_configs(result_df, channel_name=f'{name}')
 
     print("All plots have been updated with error bars and saved as PNG files in the current directory.")
 
