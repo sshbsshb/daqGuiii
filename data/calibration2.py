@@ -56,7 +56,7 @@ def plot_calibration(channel, data_points, slope, intercept, r_squared):
 
 # Directory containing calibration file
 cal_directory = "data/cal"
-cal_file = "data_2024-09-09_17-44-54_cal2.csv"  # Update this with your actual filename
+cal_file = "data_2024-09-26_15-07-38_cal1.csv"  # Update this with your actual filename
 file_path = os.path.join(cal_directory, cal_file)
 
 # Process the calibration file

@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 from itertools import cycle
+from sklearn.cluster import KMeans
 
 # Constants and configurations
 DATA_FOLDER = 'data'
@@ -17,23 +18,52 @@ HEATER_CHANNELS = ['Channel_201_mean', 'Channel_202_mean', 'Channel_203_mean',
 COLORS = plt.cm.tab20(np.linspace(0, 1, 20))
 MARKERS = ['o', 's', 'D', '^', 'v', '<', '>', 'p', '*', 'h', 'H', '+', 'x', 'd', '|', '_']
 
-def assign_flow_group(flow):
-    if 0.4 <= flow < 0.7:
-        return 0.5
-    elif 0.95 <= flow < 1.3:
-        return 1.0
-    elif 1.3 <= flow < 1.8:
-        return 1.5
-    elif 1.8 <= flow < 2.3:
-        return 2.0
-    elif 2.3 <= flow <= 2.7:
-        return 2.5
+# def assign_flow_group(flow):
+#     # Define nominal flow rates as a list or a more complex structure if your settings vary widely
+#     nominal_rates = [0.5, 0.9, 1.6, 2.0, 2.6]  # Example nominal rates
+
+#     # Round the flow to the nearest 0.1
+#     rounded_flow = round(flow, 1)
+
+#     # Find the closest nominal rate
+#     closest_nominal = min(nominal_rates, key=lambda x: abs(x - rounded_flow))
+
+#     # Check if the rounded flow is within ±0.1 of the closest nominal rate
+#     if abs(rounded_flow - closest_nominal) <= 0.19:
+#         return closest_nominal
+#     else:
+#         return None  # or handle as needed for flows that do not fit any group
+
+def find_nominal_rates(flow_data, n_clusters):
+    # Reshape flow data for clustering (sklearn expects a 2D array)
+    flow_data_reshaped = np.array(flow_data).reshape(-1, 1)
+    
+    # Apply k-means clustering
+    kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(flow_data_reshaped)
+    
+    # Get the cluster centers (nominal rates)
+    nominal_rates = kmeans.cluster_centers_.flatten()
+    
+    return sorted(nominal_rates)
+
+def assign_flow_group(flow, nominal_rates):
+    # Find the closest nominal rate
+    closest_nominal = min(nominal_rates, key=lambda x: abs(x - flow))
+    
+    # Define a tolerance within which flow rate is considered part of the nominal group
+    tolerance = 0.1
+    
+    if abs(flow - closest_nominal) <= tolerance:
+        return closest_nominal
     else:
         return None
 
 def process_csv(file_path):
     df = pd.read_csv(file_path)
-    df['Flow_Group'] = df['Channel_108_mean'].apply(assign_flow_group)
+    nominal_rates = find_nominal_rates(df['Actual_Flow_Rate'], n_clusters=5)  # Adjust n_clusters based on expected number of nominal rates
+
+    # df['Flow_Group'] = df['Channel_108_mean'].apply(assign_flow_group)
+    df['Flow_Group'] = df['Actual_Flow_Rate'].apply(lambda x: assign_flow_group(x, nominal_rates))
     config = os.path.basename(file_path).split('_')[1].split('.')[0]
     highest_power_data = df.iloc[8::9]
     
@@ -71,7 +101,7 @@ def plot_temp_vs_flow_power(df, config, channel):
         plt.errorbar(x, y, yerr=yerr, 
                      marker=marker, linestyle='-', linewidth=2, markersize=8,
                      label=f'{power}W', color=color, capsize=5, capthick=2, elinewidth=1)
-    plt.ylim(40, 70)
+    plt.ylim(30, 60)
     plt.xlabel('Actual Flow Rate (L/min)', fontsize=12)
     plt.ylabel('Temperature (°C)', fontsize=12)
     plt.title(f'{channel} Temperature vs Flow Rate for Configuration {config}', fontsize=14)
@@ -99,7 +129,7 @@ def plot_highest_power_temps(result_df):
                 plt.plot(config_data['Actual_Flow_Rate'], config_data[channel], 
                          color=COLORS[i], marker=MARKERS[i], linestyle='-', linewidth=2, markersize=8,
                          label=channel)
-        plt.ylim(40, 70)
+        plt.ylim(30, 60)
         plt.xlabel('Actual Flow Rate (L/min)', fontsize=12)
         plt.ylabel('Temperature (°C)', fontsize=12)
         plt.title(f'Heater Temperatures vs Actual Flow Rate for Configuration {config} (at 16W)', fontsize=14)
@@ -125,7 +155,7 @@ def plot_channel_203_all_configs(result_df):
             plt.plot(config_data['Actual_Flow_Rate'], config_data['Channel_203_mean'], 
                      color=COLORS[i], marker=MARKERS[i], linestyle='-', linewidth=2, markersize=8,
                      label=f'Config {config}')
-    plt.ylim(40, 70)
+    plt.ylim(30, 60)
     plt.xlabel('Actual Flow Rate (L/min)', fontsize=12)
     plt.ylabel('Temperature (°C)', fontsize=12)
     plt.title('Channel 203 Temperature vs Actual Flow Rate for All Configurations (at 16W)', fontsize=14)
@@ -151,7 +181,7 @@ def plot_channel_all_configs(result_df, channel_name='202'):
             plt.plot(config_data['Actual_Flow_Rate'], config_data[f'Channel_{channel_name}_mean'], 
                      color=COLORS[i], marker=MARKERS[i], linestyle='-', linewidth=2, markersize=8,
                      label=f'Config {config}')
-    plt.ylim(40, 70)
+    plt.ylim(30, 60)
     plt.xlabel('Actual Flow Rate (L/min)', fontsize=12)
     plt.ylabel('Temperature (°C)', fontsize=12)
     plt.title(f'Channel_{channel_name} Temperature vs Actual Flow Rate for All Configurations (at 16W)', fontsize=14)
