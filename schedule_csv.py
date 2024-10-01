@@ -7,8 +7,8 @@ def create_pump_schedule(speeds, stabilization_time, heater_stable_time, record_
     for i, speed in enumerate(speeds):
         if i == 0:
             # Initial ramp-up
-            ramp_time = 10 if speed == 3.17 else 7
-            steps = 5
+            ramp_time = 10 if speed == 3.17 else 30
+            steps = 8
             for step in range(steps):
                 intermediate_speed = 1 + (speed - 1) * (step) / steps
                 schedule.append((current_time + ramp_time * step / steps, round(intermediate_speed, 2)))
@@ -34,14 +34,14 @@ def create_pump_schedule(speeds, stabilization_time, heater_stable_time, record_
             current_time += heater_cycle_time
 
     # Add final entries
-    schedule.append((current_time+heater_cycle_time, 1))
+    schedule.append((current_time+heater_cycle_time, 3.2))
     # schedule.append((current_time + 10, 1))
     return schedule
 
 def create_heater_schedule(voltages, pump_speeds, stabilization_time, heater_stable_time, record_time):
     schedule = []
     daq_schedule = []
-    current_time = 10  # Start after initial pump ramp
+    current_time = 30  # Start after initial pump ramp
     now_speed = pump_speeds[0]
     for i, speed in enumerate(pump_speeds):
 
@@ -99,10 +99,10 @@ def plot_schedules(pump_schedule, heater_schedule, daq_schedule):
 
 # Define parameters
 pump_speeds = [3.24, 2.59, 1.83, 1.18, 0.59]
-heater_voltages = [0, 2, 4, 6, 8, 10, 12, 14, 16]
+heater_voltages = [14, 16, 18]
 daq_value = 60
-stabilization_time = 300  # Can be changed as needed
-heater_stable_time = 300
+stabilization_time = 1000  # Can be changed as needed
+heater_stable_time = 1000
 record_time = 100
 
 # Create schedules
