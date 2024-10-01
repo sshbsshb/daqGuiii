@@ -80,14 +80,14 @@ equipment:
   settings:
     max_current: 5
     max_voltage: 30
-- name: dd450_bath
-  class: bath_dd450
-  type: Bath
-  connection:
-    mode: VISA
-    address: ASRL6::INSTR
-  schedule:
-    schedule_csv: schedule_bath.csv
-  settings:
-    max_current: 5
-    max_voltage: 30
+# - name: dd450_bath
+#   class: bath_dd450
+#   type: Bath
+#   connection:
+#     mode: VISA
+#     address: ASRL6::INSTR
+#   schedule:
+#     schedule_csv: schedule_bath.csv
+#   settings:
+#     max_current: 5
+#     max_voltage: 30
