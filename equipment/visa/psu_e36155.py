@@ -19,7 +19,7 @@ class psu_e36155(VisaEquipment):
 
     async def set_protection(self):
         self.client.write('VOLT:PROT MAX')
-        self.client.write('CURR:PROT:STAT ON')
+        self.client.write('CURR:PROT:STAT ON')  #current protection on
         self.client.write('CURR:RANG HIGH')
         self.client.write('OUTP ON')
         return True
@@ -27,6 +27,7 @@ class psu_e36155(VisaEquipment):
     async def set_power(self, value=0.5):
         resistance = 13
         current = 1.5 * 6 * value / resistance # 150% of the 6 units' max current
+
         self.client.write('APPL %4.3f, %4.3f' % (value, current))
         print(f"Setting power supply voltage to {value}V, current to {current}A")
 

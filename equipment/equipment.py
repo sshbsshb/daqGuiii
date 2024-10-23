@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 import pyvisa
+from pymodbus import FramerType
+from pymodbus.client import ModbusSerialClient
 
 def expand_ranges(input_string):
     items = input_string.split(',')
@@ -55,10 +57,34 @@ class VisaEquipment(Equipment):
         print("Disconnecting VISA equipment")
 
 class ModbusEquipment(Equipment):
+    def __init__(self, name, connection):
+        self.name = name
+        self.connection = connection
+        self.mode = self.connection['mode']
+        self.address = self.connection['address']
+        self.unit = self.connection['unit']
+        if self.connection['framer'] == 'rtu':
+            self.framer = FramerType.RTU
+        else:
+            self.framer = FramerType.ASCII
+        super().__init__(name, self.mode, self.address)  # Call to superclass constructor to set address
+        self.client = self.connect()
+
     def connect(self):
+        self.client = ModbusSerialClient(
+            self.address,
+            framer=self.framer,
+            baudrate=self.connection['baudrate'],
+            parity=self.connection['parity'],
+            stopbits=self.connection['stopbits'],
+            bytesize=self.connection['bytesize'],
+        )
+        self.client.connect()
         print(f"Connecting to Modbus equipment at {self.address}")
+        return self.client
 
     def disconnect(self):
+        self.client.close()
         print("Disconnecting Modbus equipment")
 
 
