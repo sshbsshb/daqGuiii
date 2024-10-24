@@ -8,7 +8,7 @@ from scipy import stats
 def extract_config(filename):
     # Try to match the pattern for both 'cc' and 'c0', 'c1', 'c2', etc.
     # This pattern now accounts for both hyphen and underscore before the config
-    match = re.search(r'[_-]((?:cc\d?|c\d+))(?:[_-]|\.)', filename)
+    match = re.search(r'[_-]((?:cc.*?|c\d+))(?:[_-]|\.)', filename)
     if match:
         return match.group(1)
     else:
@@ -66,10 +66,10 @@ def process_csv_file(file_path, calibration_coeffs):
 
     # Add flow rate information
     flow_rates = [2.5, 2.0, 1.5, 1.0, 0.5]
-    result_df['Nominal_Flow_Rate'] = np.repeat(flow_rates, 9)  # 9 power levels for each flow rate
+    result_df['Nominal_Flow_Rate'] = np.repeat(flow_rates, 3)  # 9 power levels for each flow rate
 
     # Add power level information
-    power_levels = list(range(0, 18, 2))  # [0, 2, 4, 6, 8, 10, 12, 14, 16]
+    power_levels = list(range(14, 20, 2))  # [ 12, 14, 16]
     result_df['Power'] = power_levels * 5  # 5 flow rates
 
     # Add actual flow rate (assuming it's in Channel_108_mean)
@@ -77,7 +77,7 @@ def process_csv_file(file_path, calibration_coeffs):
 
     return result_df, config
 
-def identify_steady_states(grouped, time_threshold=3):
+def identify_steady_states(grouped, time_threshold=10):
     steady_states = []
     current_state = []
     prev_time = None

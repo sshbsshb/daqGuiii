@@ -114,9 +114,9 @@ def plot_schedules(pump_schedule, heater_schedule, daq_schedule):
 pump_speeds = [3.24, 2.59, 1.83, 1.18, 0.59]
 heater_voltages = [14, 16, 18]
 daq_value = 60
-stabilization_time = 1500  # Can be changed as needed
-extra_initial_stabilization = 1000  # Extra stabilization time at the initial stage
-heater_stable_time = 1000
+stabilization_time = 600  # Can be changed as needed
+extra_initial_stabilization = 1500  # Extra stabilization time at the initial stage
+heater_stable_time = 600
 record_time = 100
 
 # Create schedules
