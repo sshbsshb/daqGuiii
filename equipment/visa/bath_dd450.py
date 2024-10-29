@@ -17,7 +17,7 @@ class bath_dd450(VisaEquipment):
     async def set_protection(self):
         self.client.write('out_sp_03 95') # set high temperature
         # time.sleep(0.1)
-        self.client.write('out_sp_04 0') # set low temperature
+        self.client.write('out_sp_04 5') # set low temperature
         # time.sleep(0.1)
         return True
 

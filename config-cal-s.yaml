@@ -1,4 +1,4 @@
-overall_time_limit: 126400 # 24 hours in second
+overall_time_limit: 86400 # 24 hours in second
 equipment:
 - name: keysight_970A_daq
   class: daq_keysight #class file
@@ -8,7 +8,7 @@ equipment:
     address: USB0::0x2A8D::0x5101::MY58032659::0::INSTR
   schedule:
     # sample_interval: 0.4
-    schedule_csv: schedule_daq_cal.csv
+    schedule_csv: schedule_daq_cal_s.csv
   settings:
     channels:
         - channel: "101:105"
@@ -30,7 +30,7 @@ equipment:
 #     mode: VISA
 #     address: ASRL3::INSTR
 #   schedule:
-#     schedule_csv: schedule_pump_cal.csv
+#     schedule_csv: schedule_pump.csv
 #   settings:
 #     max_current: 5
 #     max_voltage: 30
@@ -52,11 +52,11 @@ equipment:
     mode: VISA
     address: ASRL6::INSTR
   schedule:
-    schedule_csv: schedule_bath_cal.csv
+    schedule_csv: schedule_bath_cal_s.csv
   settings:
     max_current: 5
     max_voltage: 30
-    - name: leadfluid_ct3000f
+- name: leadfluid_ct3000f
   class: pump_ct3000f
   type: pump
   connection:
