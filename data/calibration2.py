@@ -14,8 +14,8 @@ def process_calibration_file(file_path):
     channels = ['Channel_101', 'Channel_102', 'Channel_103', 'Channel_104'] + [f'Channel_{i}' for i in range(201, 211)]
     calibration_data = {channel: {} for channel in channels}
     
-    reference_points = [20, 30, 40, 50, 60, 70, 80, 90]
-    
+    # reference_points = [20, 30, 40, 50, 60, 70, 80, 90]
+    reference_points = [89.96, 79.99, 70.01, 60.0, 50.01, 40.02, 30.01, 20.01] # [49.39, 41.16, 31.86] 
     for channel in channels:
         channel_data = df[df['Channel'] == channel]
         for ref_point in reference_points:
@@ -56,7 +56,7 @@ def plot_calibration(channel, data_points, slope, intercept, r_squared):
 
 # Directory containing calibration file
 cal_directory = "data/cal"
-cal_file = "data_2024-09-26_15-07-38_cal1.csv"  # Update this with your actual filename
+cal_file = "data_2024-10-20_10-33-36_cal4.csv"  # Update this with your actual filename
 file_path = os.path.join(cal_directory, cal_file)
 
 # Process the calibration file

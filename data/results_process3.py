@@ -8,7 +8,7 @@ from scipy import stats
 def extract_config(filename):
     # Try to match the pattern for both 'cc' and 'c0', 'c1', 'c2', etc.
     # This pattern now accounts for both hyphen and underscore before the config
-    match = re.search(r'[_-]((?:cc.*?|c\d+))(?:[_-]|\.)', filename)
+    match = re.search(r'[_-]((?:c.*\d+))(?:[_-]|\.)', filename)
     if match:
         return match.group(1)
     else:

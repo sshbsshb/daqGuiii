@@ -10,6 +10,7 @@ class psu_e36155(VisaEquipment):
         self.data_manager = data_manager  # Store the AsyncDataManager instance
 
     async def initialize(self):
+        self.client.write("*RST")
         await self.set_sense()
         await self.set_protection()
         print("e36155 ok!")
