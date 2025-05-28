@@ -1,4 +1,5 @@
 overall_time_limit: 86400 # 24 hours in second
+batch_repetitions: 1
 equipment:
 - name: keysight_970A_daq
   class: daq_keysight #class file
@@ -23,17 +24,17 @@ equipment:
           measurement: "FRES" #RES for 2-wire
           sensor_type: "100" #AUTO
           remark: "4-wire resistance"
-# - name: korad_ka3005_pump
-#   class: psu_ka3005
-#   type: PowerSupply
-#   connection:
-#     mode: VISA
-#     address: ASRL3::INSTR
-#   schedule:
-#     schedule_csv: schedule_pump.csv
-#   settings:
-#     max_current: 5
-#     max_voltage: 30
+- name: korad_ka3005_pump
+  class: psu_ka3005
+  type: PowerSupply
+  connection:
+    mode: VISA
+    address: ASRL3::INSTR
+  schedule:
+    schedule_csv: schedule_pump_cal.csv
+  settings:
+    max_current: 5
+    max_voltage: 30
 # - name: keysight_e36155_heater
 #   class: psu_e36155
 #   type: PowerSupply
@@ -56,20 +57,20 @@ equipment:
   settings:
     max_current: 5
     max_voltage: 30
-- name: leadfluid_ct3000f
-  class: pump_ct3000f
-  type: pump
-  connection:
-    mode: MODBUS
-    address: COM10
-    framer: rtu
-    baudrate: 9600
-    parity: E
-    stopbits: 1
-    bytesize: 8
-    unit: 1
-  schedule:
-    schedule_csv: schedule_pump_cal.csv
-  settings:
-    max_current: 5
-    max_voltage: 30
+# - name: leadfluid_ct3000f
+#   class: pump_ct3000f
+#   type: pump
+#   connection:
+#     mode: MODBUS
+#     address: COM10
+#     framer: rtu
+#     baudrate: 9600
+#     parity: E
+#     stopbits: 1
+#     bytesize: 8
+#     unit: 1
+#   schedule:
+#     schedule_csv: schedule_pump_cal.csv
+#   settings:
+#     max_current: 5
+#     max_voltage: 30

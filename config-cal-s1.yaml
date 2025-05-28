@@ -9,7 +9,7 @@ equipment:
     address: USB0::0x2A8D::0x5101::MY58032659::0::INSTR
   schedule:
     # sample_interval: 0.4
-    schedule_csv: schedule_daq.csv
+    schedule_csv: schedule_daq_cal_s1.csv
   settings:
     channels:
         - channel: "101:105"
@@ -31,32 +31,32 @@ equipment:
     mode: VISA
     address: ASRL3::INSTR
   schedule:
-    schedule_csv: schedule_pump.csv
+    schedule_csv: schedule_pump_cal.csv
   settings:
     max_current: 5
     max_voltage: 30
-- name: keysight_e36155_heater
-  class: psu_e36155
-  type: PowerSupply
-  connection:
-    mode: VISA
-    address: USB0::0x2A8D::0x5902::MY63000128::0::INSTR
-  schedule:
-    schedule_csv: schedule_heater.csv
-  settings:
-    max_current: 5
-    max_voltage: 30
-# - name: dd450_bath
-#   class: bath_dd450
-#   type: Bath
+# - name: keysight_e36155_heater
+#   class: psu_e36155
+#   type: PowerSupply
 #   connection:
 #     mode: VISA
-#     address: ASRL6::INSTR
+#     address: USB0::0x2A8D::0x5902::MY63000128::0::INSTR
 #   schedule:
-#     schedule_csv: schedule_bath.csv
+#     schedule_csv: schedule_heater.csv
 #   settings:
 #     max_current: 5
 #     max_voltage: 30
+- name: dd450_bath
+  class: bath_dd450
+  type: Bath
+  connection:
+    mode: VISA
+    address: ASRL6::INSTR
+  schedule:
+    schedule_csv: schedule_bath_cal_s1.csv
+  settings:
+    max_current: 5
+    max_voltage: 30
 # - name: leadfluid_ct3000f
 #   class: pump_ct3000f
 #   type: pump
@@ -70,7 +70,7 @@ equipment:
 #     bytesize: 8
 #     unit: 1
 #   schedule:
-#     schedule_csv: schedule_pump.csv
+#     schedule_csv: schedule_pump_cal.csv
 #   settings:
 #     max_current: 5
 #     max_voltage: 30

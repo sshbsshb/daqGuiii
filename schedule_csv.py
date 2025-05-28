@@ -111,7 +111,7 @@ def plot_schedules(pump_schedule, heater_schedule, daq_schedule):
     plt.close()
 
 # Define parameters
-pump_speeds = [3.24, 2.59, 1.83, 1.18, 0.59]
+pump_speeds = [3.24, 2.59, 1.83, 1.18, 0.8]
 heater_voltages = [14, 16, 18]
 daq_value = 60
 stabilization_time = 600  # Can be changed as needed
