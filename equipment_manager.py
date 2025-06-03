@@ -42,3 +42,11 @@ class EquipmentManager:
         except Exception as e:
             print(f"Error stopping equipment: {e}")
         print("Everything has been stopped.")
+
+    def is_main_daq_busy(self):
+        for eq in self.equipment_list:
+            # This assumes that any equipment that *can* be busy will have this flag.
+            # You might refine this if only specific equipment types are considered "main DAQ".
+            if hasattr(eq, 'is_actively_collecting') and eq.is_actively_collecting:
+                return True
+        return False

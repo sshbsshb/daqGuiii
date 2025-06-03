@@ -1,5 +1,15 @@
 overall_time_limit: 86400 # 24 hours in second
-batch_repetitions: 1
+batch_settings:
+  batch_repetitions: 3
+  # Set to true to automatically start the next batch after the current one finishes.
+  # If false, the user must press "Start" for each batch.
+  # The first batch always requires a manual "Start" press.
+  auto_start_next_batch: True # Default to false (manual start)
+  
+  # Delay in seconds before automatically starting the next batch.
+  # Only used if auto_start_next_batch is true.
+  auto_start_delay_seconds: 5
+
 equipment:
 - name: keysight_970A_daq
   class: daq_keysight #class file
@@ -74,3 +84,34 @@ equipment:
 #   settings:
 #     max_current: 5
 #     max_voltage: 30
+
+idle_monitoring:
+  enabled: true
+  interval_seconds: 10
+  equipment_name: "keysight_970A_daq" # Name of the DAQ to use for idle reads
+  # Channel IDs (as defined in the DAQ's scan list, e.g., "101", "106")
+  # to be displayed during idle monitoring. These must be part of the DAQ's
+  # main scan list configured during its initialization.
+  display_channel_ids: ["101", "108"] # Example: display data for channels 101, 106
+
+safety_rules:
+  enabled: true
+  check_interval_seconds: 2 # How often to check safety conditions
+  initial_ramp_up_delay_seconds: 15
+  rules:
+    - name: "Ch101_OverTemp"
+      enabled: true
+      channel_id: "Channel_101" # This MUST match the channel ID string used in DataManager (e.g., "Channel_101")
+      condition: "greater_than" # "greater_than", "less_than", "outside_range" (threshold would be [min, max])
+      threshold: 70 # Single value for greater_than/less_than, list for outside_range [low, high]
+      action: "shutdown" # "shutdown" or "warning_only"
+      message: "SAFETY ALERT: Channel 101 temperature critical (> 60 C)!"
+      # persistence_readings: 3 # Optional: condition must be met for X consecutive valid readings
+
+    - name: "Ch108_VoltageLow"
+      enabled: true
+      channel_id: "Channel_108"
+      condition: "less_than"
+      threshold: 0.5
+      action: "shutdown"
+      message: "SAFETY WARNING: Channel 108 voltage is low (< 0.5 V)."

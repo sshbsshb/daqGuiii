@@ -11,12 +11,15 @@ def load_config(filename):
 
 async def main_coroutine(loop_instance): # Renamed and accepts the loop instance
     # Load configuration
-    config = load_config('config-cal-s1.yaml')
+    config = load_config('config.yaml')
 
     # Setup batch parameters in app_state
-    app_state.batch_total_runs = config.get('batch_repetitions', 1)
+    batch_config = config.get('batch_settings', {})
+    app_state.batch_total_runs = batch_config.get('batch_repetitions', 1)
     if app_state.batch_total_runs > 1:
         app_state.batch_mode_active = True
+        app_state.auto_start_next_batch = batch_config.get('auto_start_next_batch', False)
+        app_state.auto_start_delay_s = batch_config.get('auto_start_delay_seconds', 5)
 
     # Create and run the application, passing the loop
     app_runner = ApplicationRunner(config, loop_instance)

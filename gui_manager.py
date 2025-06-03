@@ -27,6 +27,9 @@ class GUIManager:
                 dpg.add_button(label="Save", width=75, callback=self.save_handler, tag="save_button", enabled=False) 
             # Batch info text will be updated by update_batch_display
             dpg.add_text("", tag="batch_info_text", pos=(dpg.get_item_pos("save_button")[0] + 85, dpg.get_item_pos("save_button")[1]))
+            
+            with dpg.window(label="SYSTEM STATUS", modal=False, show=False, tag="safety_alert_window", pos=(0, 700), width=1000, height=100, no_close=True, no_move=True, no_resize=True):
+                dpg.add_text("System OK", tag="safety_alert_text", color=(0, 255, 0), wrap=980) # Green for OK
 
             with dpg.group(horizontal=False):
                 self.setup_live_plot()
@@ -47,6 +50,7 @@ class GUIManager:
             dpg.enable_item("save_button") # Enable save if not in a multi-batch sequence waiting to start        
 
     def update_batch_display(self):
+        print(f"DEBUG: update_batch_display called")
         if dpg.does_item_exist("batch_info_text"):
             if app_state.batch_mode_active:
                 dpg.set_value("batch_info_text", f"Batch: {app_state.batch_current_run}/{app_state.batch_total_runs}")
@@ -192,6 +196,9 @@ class GUIManager:
     ## GUI---Exit button
     def exit_handler(self):
         print("GUI Exit handler: Attempting to stop application.")
+        print(f"DEBUG: exit_handler called from:")
+        import traceback
+        traceback.print_stack()
         app_state.stop() # Signal ongoing batch (if any) to stop
 
         # The DPG window closing is handled by ApplicationRunner.run's finally block
@@ -266,6 +273,7 @@ class GUIManager:
             print(f"Error while creating progress plot: {e}")
 
     def start_stop_action(self, current_label_or_action):
+        print(f"DEBUG: start_stop_action called with: {current_label_or_action}")
         # current_label_or_action can be "Start", "Stop", or the label from the button
         action_is_start = False
         if isinstance(current_label_or_action, str) and current_label_or_action == "Start":
