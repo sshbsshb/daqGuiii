@@ -5,4 +5,5 @@ Features:
     - New GUI using Dear PyGUI
     - Using asynio to manage all the equipment connection and communication
     - Support constant interval schedule and pre-defined schedule in csv file for equipment control
-    - Overall runtime limit to provide some safety measures
+    - Overall runtime limit
+    - Monitoring and safety value emergency stop feature
