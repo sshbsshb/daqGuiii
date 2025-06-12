@@ -176,11 +176,8 @@ class ApplicationRunner:
                     data_tuples = await read_method_to_use()
 
                     if data_tuples:
-                        # Use the discussed 'add_realtime_plot_data' if you implement it in DataManager
-                        # to separate this data from saved data.
-                        # For now, using add_data_batch as per your current DataManager.
-                        # This means idle data will also go into the main dataframe and be saved.
-                        await self.data_manager.add_data_batch(data_tuples)
+                        # await self.data_manager.add_data_batch(data_tuples)
+                        await self.data_manager.add_realtime_plot_data(data_tuples)
                         
                 except asyncio.CancelledError:
                     print("Idle monitoring loop's read operation was cancelled.")

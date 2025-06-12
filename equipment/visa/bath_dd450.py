@@ -10,7 +10,6 @@ class bath_dd450(VisaEquipment):
         self.data_manager = data_manager  # Store the AsyncDataManager instance
 
     async def initialize(self):
-        await self.set_start()
         await self.set_protection()
         print("dd450 ok!")
 
@@ -43,6 +42,7 @@ class bath_dd450(VisaEquipment):
         return True
 
     async def start(self):
+        await self.set_start()
         if self.schedule:
             await self.schedule.setup_schedule(self.set_temperature)
 

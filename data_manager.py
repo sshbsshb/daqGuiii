@@ -31,6 +31,11 @@ class AsyncDataManager:
                 self.plot_deque.append((timestamp, name, channel, new_data))
                 self.data_accumulator.append({'Timestamp': timestamp, 'Name':name, 'Channel': channel, 'Data': new_data})
 
+    async def add_realtime_plot_data(self, data_tuples):
+        async with self.lock:
+            for timestamp, name, channel, new_data in data_tuples:
+                self.plot_deque.append((timestamp, name, channel, new_data))
+
     async def update_dataframe(self):
         async with self.lock:
             if self.data_accumulator:
@@ -79,7 +84,6 @@ class AsyncDataManager:
             raise
         finally:
             print("Periodic dataframe update finished.")
-
 
     async def save_data(self, batch_num=None):
         await self.update_dataframe()  # Ensure the DataFrame is up to date

@@ -196,9 +196,6 @@ class GUIManager:
     ## GUI---Exit button
     def exit_handler(self):
         print("GUI Exit handler: Attempting to stop application.")
-        print(f"DEBUG: exit_handler called from:")
-        import traceback
-        traceback.print_stack()
         app_state.stop() # Signal ongoing batch (if any) to stop
 
         # The DPG window closing is handled by ApplicationRunner.run's finally block

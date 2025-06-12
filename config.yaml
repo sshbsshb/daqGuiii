@@ -1,6 +1,6 @@
 overall_time_limit: 86400 # 24 hours in second
 batch_settings:
-  batch_repetitions: 3
+  batch_repetitions: 2
   # Set to true to automatically start the next batch after the current one finishes.
   # If false, the user must press "Start" for each batch.
   # The first batch always requires a manual "Start" press.
@@ -8,7 +8,7 @@ batch_settings:
   
   # Delay in seconds before automatically starting the next batch.
   # Only used if auto_start_next_batch is true.
-  auto_start_delay_seconds: 5
+  auto_start_delay_seconds: 2
 
 equipment:
 - name: keysight_970A_daq
@@ -45,6 +45,7 @@ equipment:
   settings:
     max_current: 5
     max_voltage: 30
+
 - name: keysight_e36155_heater
   class: psu_e36155
   type: PowerSupply
@@ -56,17 +57,18 @@ equipment:
   settings:
     max_current: 5
     max_voltage: 30
-# - name: dd450_bath
-#   class: bath_dd450
-#   type: Bath
-#   connection:
-#     mode: VISA
-#     address: ASRL6::INSTR
-#   schedule:
-#     schedule_csv: schedule_bath.csv
-#   settings:
-#     max_current: 5
-#     max_voltage: 30
+
+- name: dd450_bath
+  class: bath_dd450
+  type: Bath
+  connection:
+    mode: VISA
+    address: ASRL6::INSTR
+  schedule:
+    schedule_csv: schedule_bath.csv
+  settings:
+    max_current: 5
+    max_voltage: 30
 # - name: leadfluid_ct3000f
 #   class: pump_ct3000f
 #   type: pump
